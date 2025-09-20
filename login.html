@@ -616,7 +616,7 @@
                 // 使用code向服务器请求access token
                 // 注意：这里需要一个后端API来处理OAuth流程，因为不能在前端暴露Client Secret
                 fetch('http://localhost:3000/github-auth', {
-                    method: 'POST',
+                method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                      },
