@@ -24,17 +24,17 @@
         }
 
         [data-theme="dark"] {
-            --text-color: #e0e0e0;
-            --text-light: #a0a0a0;
+            --text-color: #f0f0f0; /* 增强对比度 */
+            --text-light: #b0b0b0; /* 增强对比度 */
             --light-color: #121212;
-            --card-bg: #1e1e1e;
+            --card-bg: #1a1a1a; /* 加深背景增强对比 */
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             --primary-color: #64b5f6;
             --secondary-color: #81c784;
             --accent-color: #ff8a65;
             --dark-color: #f5f5f5;
-            --nav-bg: rgba(30, 30, 30, 0.95);
-            --border-color: #444;
+            --nav-bg: rgba(25, 25, 25, 0.95); /* 加深导航栏背景 */
+            --border-color: #555; /* 加深边框增强对比 */
             --scoin-color: #ba68c8;
         }
 
@@ -72,7 +72,7 @@
             width: 50px;
             height: 50px;
             border: 5px solid var(--card-bg);
-            border-top: 5px solid var(--primary极域电子教室破解工具-color);
+            border-top: 5px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -188,6 +188,7 @@
 
         .donate-intro p {
             margin-bottom: 15px;
+            color: var(--text-color); /* 确保使用正确的变量 */
         }
 
         .amount-selection {
@@ -213,6 +214,7 @@
             font-weight: bold;
             min-width: 80px;
             text-align: center;
+            color: var(--text-color); /* 确保使用正确的变量 */
         }
 
         .amount-option:hover {
@@ -235,6 +237,7 @@
             display: block;
             margin-bottom: 10px;
             font-weight: bold;
+            color: var(--text-color); /* 确保使用正确的变量 */
         }
 
         .amount-input {
@@ -247,6 +250,7 @@
         .currency-symbol {
             font-size: 1.5rem;
             font-weight: bold;
+            color: var(--text-color); /* 确保使用正确的变量 */
         }
 
         input[type="number"] {
@@ -257,6 +261,8 @@
             font-size: 1.2rem;
             text-align: center;
             transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-color); /* 确保使用正确的变量 */
         }
 
         input[type="number"]:focus {

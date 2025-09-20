@@ -72,7 +72,7 @@
             width: 50px;
             height: 50px;
             border: 5px solid var(--card-bg);
-            border-top: 5极域电子教室破解工具px solid var(--primary-color);
+            border-top: 5px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -98,7 +98,7 @@
             top: 0;
             left: 0;
             right: 0;
-            background: var(--nav极域电子教室破解工具-bg);
+            background: var(--nav-bg);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -619,6 +619,154 @@
             font-size: 1.5rem;
         }
 
+        /* ===== 桌宠样式 ===== */
+        .desktop-pet-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 177px;
+            height: 201px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            border-radius: 0;
+            box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 99;
+            border-right: 2px solid #90caf9;
+            border-bottom: 2px solid #90caf9;
+            user-select: none;
+        }
+
+        .pet {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            z-index: 10;
+            transition: left 0.2s linear, top 0.2s linear;
+        }
+
+        .pet-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            bottom: 0;
+            transform-origin: center bottom;
+        }
+
+        .pet-image.active {
+            display: block;
+        }
+
+        .pet-image.bounce {
+            animation: bounceAnimation 0.7s ease;
+        }
+
+        @keyframes bounceAnimation {
+            0% { transform: scaleY(0.8) scaleX(1.1); }
+            30% { transform: scaleY(1.1) scaleX(0.9); }
+            60% { transform: scaleY(0.95) scaleX(1.05); }
+            80% { transform: scaleY(1.02) scaleX(0.98); }
+            100% { transform: scaleY(1) scaleX(1); }
+        }
+
+        .pet:hover .pet-image.active {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+
+        .speechBubble {
+            position: absolute;
+            background-color: white;
+            border-radius: 0;
+            padding: 10px 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: normal;
+            max-width: 180px;
+            word-wrap: break-word;
+        }
+
+        .speechBubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+
+        .pet-info-image {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            width: 90%;
+            height: 20px;
+            margin: 0 auto;
+            object-fit: fill;
+        }
+
+        .pet-title {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #1565c0;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .pet-cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: cloudMove linear infinite;
+            filter: blur(2px);
+        }
+
+        @keyframes cloudMove {
+            0% { transform: translateX(300px); }
+            100% { transform: translateX(-300px); }
+        }
+
+        .pet-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .pet-control-btn {
+            width: 25px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .pet-control-btn:hover {
+            background: white;
+        }
+
         /* ===== 移动设备适配 ===== */
         @media (max-width: 768px) {
             .top-nav {
@@ -665,6 +813,10 @@
                 flex-direction: column;
                 align-items: center;
             }
+
+            .desktop-pet-container {
+                display: none; /* 在移动设备上隐藏桌宠 */
+            }
         }
     </style>
 </head>
@@ -707,6 +859,9 @@
             </a>
             <a href="scoin-system.html" class="nav-link">
                 <i class="fas fa-coins"></i> S币系统
+            </a>
+            <a href="donate.html" class="nav-link">
+                <i class="fas fa-donate"></i> 捐献
             </a>
         </div>
         
@@ -834,7 +989,39 @@
         </footer>
     </div>
 
+    <!-- 桌宠容器 -->
+    <div class="desktop-pet-container" id="desktopPetContainer">
+        <div class="pet-title">q(≧▽≦q)</div>
+        <div class="pet" id="pet">
+            <img class="pet-image active" src="42a64bec307a2e1617c3035b085d706aE1.png" alt="桌面宠物状态1" onerror="handlePetImageError(this)">
+            <img class="pet-image" src="813808ebbd1f0a1217214ffcfe0889c55D.png" alt="桌面宠物状态2" onerror="handlePetImageError(this)">
+            <img class="pet-image" src="a32bc3dc72fd64d04b655a0d2bcb7420BS.png" alt="桌面宠物状态3" onerror="handlePetImageError(this)">
+        </div>
+        <img class="pet-info-image" src="https://file.uhsea.com/2509/5f8cb40be5773df4d13e3a8d5f6a305f2Q.png" alt="桌宠坏掉了，加载资源不正常QwQ" onerror="this.style.display='none'">
+        
+        <div class="pet-controls">
+            <button class="pet-control-btn" id="petToggleBtn">×</button>
+        </div>
+    </div>
+
     <script>
+        // 处理桌宠图片加载错误
+        function handlePetImageError(img) {
+            console.log('桌宠图片加载失败:', img.src);
+            img.style.display = 'none';
+            
+            // 如果当前显示的图片加载失败，尝试显示其他图片
+            if (img.classList.contains('active')) {
+                const petImages = document.querySelectorAll('.pet-image');
+                for (let i = 0; i < petImages.length; i++) {
+                    if (petImages[i] !== img && petImages[i].complete && !petImages[i].classList.contains('active')) {
+                        petImages[i].classList.add('active');
+                        break;
+                    }
+                }
+            }
+        }
+
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() {
@@ -853,6 +1040,9 @@
                     
                     // 初始化主题切换
                     initThemeToggle();
+                    
+                    // 初始化桌宠
+                    initDesktopPet();
                 } catch (error) {
                     console.error('初始化出错:', error);
                 }
@@ -993,7 +1183,7 @@
         async function claimScoin(user) {
             const btn = document.getElementById('claimScoinBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></极域电子教室破解工具i> 领取中...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 领取中...';
             
             try {
                 const response = await fetch('/.netlify/functions/claim-scoin', {
@@ -1064,6 +1254,481 @@
                     }
                 });
             }
+        }
+        
+        // 初始化桌宠
+        function initDesktopPet() {
+            // 获取元素
+            const pet = document.getElementById('pet');
+            const container = document.getElementById('desktopPetContainer');
+            const petImages = document.querySelectorAll('.pet-image');
+            const petToggleBtn = document.getElementById('petToggleBtn');
+            
+            // 对话内容
+            const autoDialogues = [
+                {text: '今天天气不错，【换行】别问我咋知道的', audio: ''},
+                {text: '有点无聊呢...', audio: ''},
+                {text: '想玩点什么?', audio: ''},
+                {text: '嘿嘿~', audio: 'audio/嘿嘿~.wav'},
+                {text: '发呆中...', audio: ''},
+                {text: '你可能觉得我没啥用，【换行】不过确实。。', audio: ''},
+                {text: '想听点什么术曲呢？', audio: ''},
+                {text: '喵呜~好困', audio: ''},
+                {text: '大家在论坛里玩的开心~', audio: ''},
+                {text: '也是4了', audio: 'audio/也是4了.wav'}
+            ];
+            
+            const clickDialogues = [
+                {text: '你好呀!', audio: ''},
+                {text: '嗷>w<舒服', audio: ''},
+                {text: '全部、全部、大失败！', audio: 'audio/全部全部大失败！.mp3'},
+                {text: '好痒呀!', audio: ''},
+                {text: 'ワールドイズマイン', audio: 'audio/「ワールドイズマイン」.wav'},
+                {text: '别信那姓T的话！', audio: 'audio/别听那T氏的话.mp3'},
+                {text: '你喜欢miku吗，【换行】好萌的那种', audio: ''},
+                {text: '你可能觉得我没用，【换行】不过确实', audio: ''},
+                {text: '前科一犯，笑止千万', audio: 'audio/前科一犯，笑止千万.mp3'}
+            ];
+            
+            // 创建云朵
+            function createClouds() {
+                const cloudCount = 5;
+                
+                for (let i = 0; i < cloudCount; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'pet-cloud';
+                    
+                    const size = Math.random() * 40 + 30;
+                    const height = size * 0.5;
+                    
+                    const top = Math.random() * 100 + 20;
+                    const left = Math.random() * 300;
+                    
+                    const duration = Math.random() * 30 + 20;
+                    
+                    cloud.style.width = size + 'px';
+                    cloud.style.height = height + 'px';
+                    cloud.style.top = top + 'px';
+                    cloud.style.left = left + 'px';
+                    cloud.style.animationDuration = duration + 's';
+                    cloud.style.opacity = Math.random() * 0.5 + 0.3;
+                    
+                    container.appendChild(cloud);
+                    
+                    cloud.addEventListener('animationend', function() {
+                        cloud.remove();
+                        createClouds();
+                    });
+                }
+            }
+            
+            // 预加载音频
+            const audioCache = {};
+            
+            function preloadAudio(url) {
+                if (!url) return null;
+                if (!audioCache[url]) {
+                    audioCache[url] = new Audio(url);
+                    audioCache[url].preload = 'auto';
+                    audioCache[url].volume = 0.6;
+                }
+                return audioCache[url];
+            }
+            
+            // 预加载所有音频
+            function preloadAllAudios() {
+                autoDialogues.forEach(dialogue => preloadAudio(dialogue.audio));
+                clickDialogues.forEach(dialogue => preloadAudio(dialogue.audio));
+            }
+            
+            preloadAllAudios();
+            
+            // 播放音频
+            function playAudio(url) {
+                if (!url) return;
+                try {
+                    const audio = preloadAudio(url);
+                    const clone = audio.cloneNode();
+                    clone.volume = audio.volume;
+                    clone.play().catch(e => console.log("音频播放失败:", e));
+                } catch (e) {
+                    console.log("音频播放错误:", e);
+                }
+            }
+            
+            // 物理参数
+            let x = 100;
+            let y = 80;
+            let velocityX = 0;
+            let velocityY = 0;
+            let gravity = 0.15;
+            let friction = 0.85;
+            let bounce = 0.7;
+            let airResistance = 0.97;
+            
+            // 当前状态索引
+            let currentStateIndex = 0;
+            
+            // 设置桌宠初始位置
+            pet.style.left = x + 'px';
+            pet.style.top = y + 'px';
+            
+            // 随机移动相关变量
+            let lastRandomMoveTime = 0;
+            let randomMoveInterval = 3000 + Math.random() * 5000;
+            
+            // 图片切换计时器
+            let lastImageSwitchTime = 0;
+            const imageSwitchInterval = 7000;
+            
+            // Q弹效果冷却时间
+            let lastBounceTime = 0;
+            const bounceCooldown = 500;
+            
+            // 鼠标不互动计时器
+            let lastMouseInteractionTime = Date.now();
+            let isMovingToCenter = false;
+            const centerX = (container.offsetWidth - pet.offsetWidth) / 2;
+            const centerY = (container.offsetHeight - pet.offsetHeight) / 2;
+            
+            // 更新表情状态
+            function updateExpression(stateIndex) {
+                if (stateIndex === currentStateIndex) return;
+                
+                const currentTime = Date.now();
+                
+                if (currentTime - lastBounceTime < bounceCooldown) {
+                    return;
+                }
+                
+                petImages[currentStateIndex].classList.remove('active');
+                petImages[stateIndex].classList.add('active');
+                
+                petImages[stateIndex].classList.add('bounce');
+                setTimeout(() => {
+                    petImages[stateIndex].classList.remove('bounce');
+                }, 700);
+                
+                lastBounceTime = currentTime;
+                currentStateIndex = stateIndex;
+            }
+            
+            // 切换到特定图片（状态3）
+            function switchToStateThree() {
+                updateExpression(2);
+            }
+            
+            // 随机切换图片
+            function switchImageRandomly(currentTime) {
+                if (currentTime - lastImageSwitchTime > imageSwitchInterval) {
+                    if (Math.random() < 0.8) {
+                        switchToStateThree();
+                    } else {
+                        let newStateIndex;
+                        do {
+                            newStateIndex = Math.floor(Math.random() * petImages.length);
+                        } while (newStateIndex === currentStateIndex);
+                        
+                        updateExpression(newStateIndex);
+                    }
+                    
+                    lastImageSwitchTime = currentTime;
+                }
+            }
+            
+            // 检查鼠标不互动状态
+            function checkMouseInactivity(currentTime) {
+                if (currentTime - lastMouseInteractionTime > 5000 && !isDragging) {
+                    if (!isMovingToCenter) {
+                        isMovingToCenter = true;
+                        
+                        pet.style.transition = 'left 2s ease, top 2s ease';
+                        x = centerX;
+                        y = centerY;
+                        pet.style.left = x + 'px';
+                        pet.style.top = y + 'px';
+                        
+                        setTimeout(() => {
+                            isMovingToCenter = false;
+                            pet.style.transition = '';
+                            velocityX = 0;
+                            velocityY = 0;
+                        }, 2000);
+                    }
+                }
+            }
+            
+            // 随机移动函数
+            function performRandomMove(currentTime) {
+                if (isMovingToCenter) return;
+                
+                if (currentTime - lastRandomMoveTime > randomMoveInterval) {
+                    velocityX = (Math.random() - 0.5) * 2;
+                    velocityY = (Math.random() - 0.5) * 2;
+                    
+                    lastRandomMoveTime = currentTime;
+                    randomMoveInterval = 3000 + Math.random() * 5000;
+                    
+                    if (Math.random() < 0.3) {
+                        showSpeechBubble('auto');
+                    }
+                }
+            }
+            
+            // 显示对话气泡
+            function showSpeechBubble(type) {
+                const existingBubble = document.querySelector('.speechBubble');
+                if (existingBubble) {
+                    existingBubble.remove();
+                }
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'speechBubble';
+                
+                let dialogue;
+                if (type === 'auto') {
+                    dialogue = autoDialogues[Math.floor(Math.random() * autoDialogues.length)];
+                } else {
+                    dialogue = clickDialogues[Math.floor(Math.random() * clickDialogues.length)];
+                }
+                
+                const formattedText = dialogue.text.replace(/【换行】/g, '<br>');
+                bubble.innerHTML = formattedText;
+                
+                container.appendChild(bubble);
+                
+                const textWidth = bubble.scrollWidth;
+                bubble.style.width = 'auto';
+                bubble.style.maxWidth = '180px';
+                
+                let bubbleX = x + pet.offsetWidth / 2 - (bubble.offsetWidth / 2);
+                let bubbleY = y - bubble.offsetHeight - 20;
+                
+                if (bubbleX < 10) bubbleX = 10;
+                if (bubbleX + bubble.offsetWidth > container.offsetWidth - 20) {
+                    bubbleX = container.offsetWidth - bubble.offsetWidth - 20;
+                }
+                if (bubbleY < 10) bubbleY = 10;
+                
+                bubble.style.left = bubbleX + 'px';
+                bubble.style.top = bubbleY + 'px';
+                
+                playAudio(dialogue.audio);
+                
+                setTimeout(() => {
+                    bubble.style.opacity = '1';
+                }, 10);
+                
+                setTimeout(() => {
+                    bubble.style.opacity = '0';
+                    setTimeout(() => {
+                        if (bubble.parentNode) {
+                            bubble.parentNode.removeChild(bubble);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            // 增强的碰撞处理函数
+            function handleCollision(collisionType, impactStrength) {
+                const dynamicBounce = Math.min(0.95, bounce + impactStrength * 0.3);
+                
+                if (collisionType === 'left' || collisionType === 'right') {
+                    velocityX = -velocityX * dynamicBounce;
+                    velocityY += (Math.random() - 0.5) * impactStrength * 0.5;
+                } else {
+                    velocityY = -velocityY * dynamicBounce;
+                    velocityX += (Math.random() - 0.5) * impactStrength * 0.5;
+                }
+                
+                velocityX *= 0.9;
+                velocityY *= 0.9;
+            }
+            
+            // 更新桌宠位置
+            function updatePosition(currentTime) {
+                checkMouseInactivity(currentTime);
+                
+                if (!isDragging && !isMovingToCenter) {
+                    performRandomMove(currentTime);
+                }
+                
+                switchImageRandomly(currentTime);
+                
+                if (!isMovingToCenter) {
+                    velocityY += gravity;
+                    
+                    if (y >= container.offsetHeight - pet.offsetHeight - 20 - 1) {
+                        velocityX *= friction;
+                        velocityY *= friction;
+                    } else {
+                        velocityX *= airResistance;
+                        velocityY *= airResistance;
+                    }
+                    
+                    if (Math.abs(velocityX) < 0.05 && Math.abs(velocityY) < 0.05 && !isDragging) {
+                        velocityX = 0;
+                        velocityY = 0;
+                    }
+                    
+                    x += velocityX;
+                    y += velocityY;
+                    
+                    let collisionType = null;
+                    let impactStrength = 0;
+                    
+                    if (x < 0) {
+                        impactStrength = Math.abs(velocityX);
+                        x = 0;
+                        collisionType = 'left';
+                    } else if (x > container.offsetWidth - pet.offsetWidth) {
+                        impactStrength = Math.abs(velocityX);
+                        x = container.offsetWidth - pet.offsetWidth;
+                        collisionType = 'right';
+                    }
+                    
+                    if (y < 40) {
+                        impactStrength = Math.max(impactStrength, Math.abs(velocityY));
+                        y = 40;
+                        collisionType = 'top';
+                    } else if (y > container.offsetHeight - pet.offsetHeight - 20) {
+                        impactStrength = Math.max(impactStrength, Math.abs(velocityY));
+                        y = container.offsetHeight - pet.offsetHeight - 20;
+                        collisionType = 'bottom';
+                    }
+                    
+                    if (collisionType && impactStrength > 0.2) {
+                        handleCollision(collisionType, impactStrength);
+                    }
+                    
+                    pet.style.left = x + 'px';
+                    pet.style.top = y + 'px';
+                    
+                    const speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+                    
+                    if (speed < 0.5) {
+                        updateExpression(0);
+                    } else if (speed < 3) {
+                        updateExpression(1);
+                    } else {
+                        updateExpression(2);
+                    }
+                }
+                
+                requestAnimationFrame(updatePosition);
+            }
+            
+            // 鼠标互动
+            let isDragging = false;
+            let dragStartX, dragStartY;
+            let initialX, initialY;
+            
+            // 更新鼠标互动时间
+            function updateMouseInteractionTime() {
+                lastMouseInteractionTime = Date.now();
+            }
+            
+            // 防止容器内文本选择
+            container.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                updateMouseInteractionTime();
+            });
+            
+            // 防止图片被拖拽
+            petImages.forEach(img => {
+                img.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+            
+            // 全局鼠标移动监听
+            document.addEventListener('mousemove', function() {
+                updateMouseInteractionTime();
+            });
+            
+            pet.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                isDragging = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialX = x;
+                initialY = y;
+                
+                pet.style.cursor = 'grabbing';
+                
+                if (Math.random() < 0.7) {
+                    showSpeechBubble('click');
+                }
+                
+                updateMouseInteractionTime();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    x = initialX + (e.clientX - dragStartX);
+                    y = initialY + (e.clientY - dragStartY);
+                    
+                    x = Math.max(0, Math.min(container.offsetWidth - pet.offsetWidth, x));
+                    y = Math.max(40, Math.min(container.offsetHeight - pet.offsetHeight - 20, y));
+                    
+                    pet.style.left = x + 'px';
+                    pet.style.top = y + 'px';
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            document.addEventListener('mouseup', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    isDragging = false;
+                    
+                    pet.style.cursor = 'pointer';
+                    
+                    velocityX = (x - initialX) * 1.2;
+                    velocityY = (y - initialY) * 1.2;
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            // 鼠标靠近时的反应
+            container.addEventListener('mousemove', function(e) {
+                const rect = container.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const petCenterX = x + pet.offsetWidth / 2;
+                const petCenterY = y + pet.offsetHeight / 2;
+                
+                const distance = Math.sqrt(
+                    Math.pow(mouseX - petCenterX, 2) + 
+                    Math.pow(mouseY - petCenterY, 2)
+                );
+                
+                if (distance < 120 && !isDragging && !isMovingToCenter) {
+                    const angle = Math.atan2(petCenterY - mouseY, petCenterX - mouseX);
+                    const force = Math.min(15, (120 - distance) / 8);
+                    
+                    velocityX += Math.cos(angle) * force * 0.2;
+                    velocityY += Math.sin(angle) * force * 0.2;
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            // 初始化云朵
+            createClouds();
+            
+            // 开始动画
+            requestAnimationFrame(updatePosition);
+            
+            // 绑定关闭按钮
+            petToggleBtn.addEventListener('click', function() {
+                container.style.display = 'none';
+            });
         }
     </script>
 </body>

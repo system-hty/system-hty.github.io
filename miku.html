@@ -1,0 +1,694 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>左上角桌宠 - 优化物理碰撞</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #f0f8ff;
+        }
+        
+        #desktopPetContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 177px;
+            height: 201px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            /* 移除圆角 */
+            border-radius: 0;
+            box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            z-index: 1000;
+            border-right: 2px solid #90caf9;
+            border-bottom: 2px solid #90caf9;
+            user-select: none;
+        }
+        
+        #pet {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            z-index: 10;
+            transition: left 0.2s linear, top 0.2s linear;
+        }
+        
+        .pet-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            bottom: 0;
+            transform-origin: center bottom;
+        }
+        
+        .pet-image.active {
+            display: block;
+        }
+        
+        .pet-image.bounce {
+            animation: bounceAnimation 0.7s ease;
+        }
+        
+        @keyframes bounceAnimation {
+            0% { transform: scaleY(0.8) scaleX(1.1); }
+            30% { transform: scaleY(1.1) scaleX(0.9); }
+            60% { transform: scaleY(0.95) scaleX(1.05); }
+            80% { transform: scaleY(1.02) scaleX(0.98); }
+            100% { transform: scaleY(1) scaleX(1); }
+        }
+        
+        #pet:hover .pet-image.active {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .speechBubble {
+            position: absolute;
+            background-color: white;
+            /* 移除圆角 */
+            border-radius: 0;
+            padding: 10px 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            /* 允许自动换行 */
+            white-space: normal;
+            /* 设置最大宽度 */
+            max-width: 180px;
+            word-wrap: break-word;
+        }
+        
+        .speechBubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        
+        .info-image {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            width: 90%;
+            height: 20px;
+            margin: 0 auto;
+            object-fit: fill;
+        }
+        
+        .title {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #1565c0;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: cloudMove linear infinite;
+            filter: blur(2px);
+        }
+        
+        @keyframes cloudMove {
+            0% { transform: translateX(300px); }
+            100% { transform: translateX(-300px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="desktopPetContainer">
+        <div class="title">q(≧▽≦q)</div>
+        <div id="pet">
+            <img class="pet-image" src="https://file.uhsea.com/2509/813808ebbd1f0a1217214ffcfe0889c55D.png" alt="桌面宠物状态1">
+            <img class="pet-image" src="https://file.uhsea.com/2509/a32bc3dc72fd64d04b655a0d2bcb7420BS.png" alt="桌面宠物状态2">
+            <img class="pet-image" src="https://file.uhsea.com/2509/42a64bec307a2e1617c3035b085d706aE1.png" alt="桌面宠物状态3">
+        </div>
+        <img class="info-image" src="https://file.uhsea.com/2509/5f8cb40be5773df4d13e3a8d5f6a305f2Q.png" alt="桌宠坏掉了，加载资源不正常QwQ">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取元素
+            const pet = document.getElementById('pet');
+            const container = document.getElementById('desktopPetContainer');
+            const petImages = document.querySelectorAll('.pet-image');
+            
+            // 对话内容 - 分离自动气泡和点击气泡
+            const autoDialogues = [
+                {text: '今天天气不错，【换行】别问我咋知道的', audio: ''},
+                {text: '有点无聊呢...', audio: ''},
+                {text: '想玩点什么?', audio: ''},
+                {text: '嘿嘿~', audio: 'https://file.uhsea.com/2509/d50bf9cfe25e416daf1c3903d20e3c4bBZ.wav'},
+                {text: '发呆中...', audio: ''},
+                {text: '你可能觉得我没啥用，【换行】不过确实。。', audio: ''},
+                {text: '想听点什么术曲呢？', audio: ''},
+                {text: '喵呜~好困', audio: ''},
+                {text: '大家在论坛里玩的开心~', audio: ''},
+                {text: '也是开学了（）', audio: 'https://file.uhsea.com/2509/13ba55668ba48a3e367b9f4cc23f073aHJ.wav'}
+            ];
+            
+            const clickDialogues = [
+                {text: '你好呀!', audio: ''},
+                {text: '嗷>w<舒服', audio: ''},
+                {text: '全部、全部、大失败！', audio: 'https://file.uhsea.com/2509/0bceb89428a66d27be8964e4d8682ac61O.mp3'},
+                {text: '好痒呀!', audio: ''},
+                {text: '别闹啦', audio: ''},
+                {text: '别信那姓T的话！', audio: 'https://file.uhsea.com/2509/19c8b74a91c552d40f2366a3602ed8bcTO.mp3'},
+                {text: '你喜欢furry吗，【换行】好萌的那种', audio: ''},
+                {text: '你可能觉得我没用，【换行】不过确实', audio: ''},
+                {text: '前科一犯，笑止千万', audio: 'https://file.uhsea.com/2509/dc34a02a52d8d4e32035e669fada7d75ZL.mp3'}
+            ];
+            
+            // 创建云朵
+            function createClouds() {
+                const cloudCount = 5; // 云朵数量
+                
+                for (let i = 0; i < cloudCount; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'cloud';
+                    
+                    // 随机云朵大小
+                    const size = Math.random() * 40 + 30;
+                    const height = size * 0.5;
+                    
+                    // 随机位置
+                    const top = Math.random() * 100 + 20;
+                    const left = Math.random() * 300;
+                    
+                    // 随机动画时长
+                    const duration = Math.random() * 30 + 20;
+                    
+                    // 设置云朵样式
+                    cloud.style.width = size + 'px';
+                    cloud.style.height = height + 'px';
+                    cloud.style.top = top + 'px';
+                    cloud.style.left = left + 'px';
+                    cloud.style.animationDuration = duration + 's';
+                    cloud.style.opacity = Math.random() * 0.5 + 0.3;
+                    
+                    // 添加到容器
+                    container.appendChild(cloud);
+                    
+                    // 动画结束后重新创建云朵
+                    cloud.addEventListener('animationend', function() {
+                        cloud.remove();
+                        createClouds();
+                    });
+                }
+            }
+            
+            // 初始化云朵
+            createClouds();
+            
+            // 预加载音频
+            const audioCache = {};
+            
+            function preloadAudio(url) {
+                if (!url) return null; // 空URL不处理
+                if (!audioCache[url]) {
+                    audioCache[url] = new Audio(url);
+                    audioCache[url].preload = 'auto';
+                    audioCache[url].volume = 0.6; // 设置默认音量
+                }
+                return audioCache[url];
+            }
+            
+            // 预加载所有音频
+            function preloadAllAudios() {
+                autoDialogues.forEach(dialogue => preloadAudio(dialogue.audio));
+                clickDialogues.forEach(dialogue => preloadAudio(dialogue.audio));
+            }
+            
+            preloadAllAudios();
+            
+            // 播放音频
+            function playAudio(url) {
+                if (!url) return; // 空URL不播放
+                try {
+                    const audio = preloadAudio(url);
+                    // 克隆音频对象以实现同时播放多个声音
+                    const clone = audio.cloneNode();
+                    clone.volume = audio.volume;
+                    clone.play().catch(e => console.log("音频播放失败:", e));
+                } catch (e) {
+                    console.log("音频播放错误:", e);
+                }
+            }
+            
+            // 物理参数 - 大幅优化拖拽体验
+            let x = 100;
+            let y = 80;
+            let velocityX = 0;
+            let velocityY = 0;
+            let gravity = 0.15; // 减少重力
+            let friction = 0.85; // 减少摩擦力
+            let bounce = 0.7; // 基础弹性系数
+            let airResistance = 0.97; // 空气阻力
+            
+            // 当前状态索引
+            let currentStateIndex = 1;
+            
+            // 设置桌宠初始位置
+            pet.style.left = x + 'px';
+            pet.style.top = y + 'px';
+            
+            // 设置第一个图片为激活状态
+            petImages[currentStateIndex].classList.add('active');
+            
+            // 随机移动相关变量
+            let lastRandomMoveTime = 0;
+            let randomMoveInterval = 3000 + Math.random() * 5000;
+            
+            // 图片切换计时器
+            let lastImageSwitchTime = 0;
+            const imageSwitchInterval = 7000;
+            
+            // Q弹效果冷却时间
+            let lastBounceTime = 0;
+            const bounceCooldown = 500;
+            
+            // 鼠标不互动计时器
+            let lastMouseInteractionTime = Date.now();
+            let isMovingToCenter = false;
+            const centerX = (container.offsetWidth - pet.offsetWidth) / 2;
+            const centerY = (container.offsetHeight - pet.offsetHeight) / 2;
+            
+            // 更新表情状态
+            function updateExpression(stateIndex) {
+                if (stateIndex === currentStateIndex) return;
+                
+                const currentTime = Date.now();
+                
+                // 检查冷却时间
+                if (currentTime - lastBounceTime < bounceCooldown) {
+                    return;
+                }
+                
+                // 移除当前激活状态
+                petImages[currentStateIndex].classList.remove('active');
+                
+                // 添加新激活状态
+                petImages[stateIndex].classList.add('active');
+                
+                // 添加弹跳动画
+                petImages[stateIndex].classList.add('bounce');
+                setTimeout(() => {
+                    petImages[stateIndex].classList.remove('bounce');
+                }, 700);
+                
+                // 更新最后弹跳时间
+                lastBounceTime = currentTime;
+                
+                currentStateIndex = stateIndex;
+            }
+            
+            // 切换到特定图片（状态3）
+            function switchToStateThree() {
+                updateExpression(2);
+            }
+            
+            // 随机切换图片
+            function switchImageRandomly(currentTime) {
+                if (currentTime - lastImageSwitchTime > imageSwitchInterval) {
+                    // 80%的几率切换到状态3，20%的几率随机切换
+                    if (Math.random() < 0.8) {
+                        switchToStateThree();
+                    } else {
+                        // 随机选择一个不同的状态
+                        let newStateIndex;
+                        do {
+                            newStateIndex = Math.floor(Math.random() * petImages.length);
+                        } while (newStateIndex === currentStateIndex);
+                        
+                        updateExpression(newStateIndex);
+                    }
+                    
+                    // 重置计时器
+                    lastImageSwitchTime = currentTime;
+                }
+            }
+            
+            // 检查鼠标不互动状态
+            function checkMouseInactivity(currentTime) {
+                if (currentTime - lastMouseInteractionTime > 5000 && !isDragging) {
+                    // 5秒无互动，开始移动到中心
+                    if (!isMovingToCenter) {
+                        isMovingToCenter = true;
+                        
+                        // 平滑移动到中心
+                        pet.style.transition = 'left 2s ease, top 2s ease';
+                        x = centerX;
+                        y = centerY;
+                        pet.style.left = x + 'px';
+                        pet.style.top = y + 'px';
+                        
+                        // 移动完成后恢复随机移动
+                        setTimeout(() => {
+                            isMovingToCenter = false;
+                            pet.style.transition = '';
+                            velocityX = 0;
+                            velocityY = 0;
+                        }, 2000);
+                    }
+                }
+            }
+            
+            // 随机移动函数
+            function performRandomMove(currentTime) {
+                if (isMovingToCenter) return; // 如果正在移动到中心，不执行随机移动
+                
+                if (currentTime - lastRandomMoveTime > randomMoveInterval) {
+                    // 随机生成一个小速度
+                    velocityX = (Math.random() - 0.5) * 2;
+                    velocityY = (Math.random() - 0.5) * 2;
+                    
+                    // 重置计时器和间隔
+                    lastRandomMoveTime = currentTime;
+                    randomMoveInterval = 3000 + Math.random() * 5000;
+                    
+                    // 显示自动对话气泡
+                    if (Math.random() < 0.3) {
+                        showSpeechBubble('auto');
+                    }
+                }
+            }
+            
+            // 显示对话气泡
+            function showSpeechBubble(type) {
+                // 移除现有的气泡
+                const existingBubble = document.querySelector('.speechBubble');
+                if (existingBubble) {
+                    existingBubble.remove();
+                }
+                
+                // 创建新气泡
+                const bubble = document.createElement('div');
+                bubble.className = 'speechBubble';
+                
+                // 根据类型选择对话内容
+                let dialogue;
+                if (type === 'auto') {
+                    dialogue = autoDialogues[Math.floor(Math.random() * autoDialogues.length)];
+                } else {
+                    dialogue = clickDialogues[Math.floor(Math.random() * clickDialogues.length)];
+                }
+                
+                // 将【换行】替换为<br>标签
+                const formattedText = dialogue.text.replace(/【换行】/g, '<br>');
+                bubble.innerHTML = formattedText;
+                
+                // 添加到容器（先添加到DOM才能计算宽度）
+                container.appendChild(bubble);
+                
+                // 计算文本宽度并设置气泡宽度
+                const textWidth = bubble.scrollWidth;
+                bubble.style.width = 'auto'; // 让宽度自适应内容
+                bubble.style.maxWidth = '180px'; // 设置最大宽度
+                
+                // 计算气泡位置，确保完全在容器内
+                let bubbleX = x + pet.offsetWidth / 2 - (bubble.offsetWidth / 2);
+                let bubbleY = y - bubble.offsetHeight - 20;
+                
+                // 限制气泡在容器内
+                if (bubbleX < 10) bubbleX = 10;
+                if (bubbleX + bubble.offsetWidth > container.offsetWidth - 20) {
+                    bubbleX = container.offsetWidth - bubble.offsetWidth - 20;
+                }
+                if (bubbleY < 10) bubbleY = 10;
+                
+                // 设置气泡位置
+                bubble.style.left = bubbleX + 'px';
+                bubble.style.top = bubbleY + 'px';
+                
+                // 播放对应的音频
+                playAudio(dialogue.audio);
+                
+                // 显示气泡
+                setTimeout(() => {
+                    bubble.style.opacity = '1';
+                }, 10);
+                
+                // 3秒后消失
+                setTimeout(() => {
+                    bubble.style.opacity = '0';
+                    setTimeout(() => {
+                        if (bubble.parentNode) {
+                            bubble.parentNode.removeChild(bubble);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            // 增强的碰撞处理函数
+            function handleCollision(collisionType, impactStrength) {
+                // 根据碰撞强度调整反弹系数
+                // 碰撞越强，反弹系数越大（最大不超过0.95）
+                const dynamicBounce = Math.min(0.95, bounce + impactStrength * 0.3);
+                
+                // 根据碰撞类型应用不同的反弹效果
+                if (collisionType === 'left' || collisionType === 'right') {
+                    velocityX = -velocityX * dynamicBounce;
+                    // 添加一点垂直方向的随机性，使碰撞更自然
+                    velocityY += (Math.random() - 0.5) * impactStrength * 0.5;
+                } else {
+                    velocityY = -velocityY * dynamicBounce;
+                    // 添加一点水平方向的随机性，使碰撞更自然
+                    velocityX += (Math.random() - 0.5) * impactStrength * 0.5;
+                }
+                
+                // 碰撞后能量损失
+                velocityX *= 0.9;
+                velocityY *= 0.9;
+            }
+            
+            // 更新桌宠位置
+            function updatePosition(currentTime) {
+                // 检查鼠标不互动状态
+                checkMouseInactivity(currentTime);
+                
+                // 如果不被拖动且不在移动到中心，偶尔执行随机移动
+                if (!isDragging && !isMovingToCenter) {
+                    performRandomMove(currentTime);
+                }
+                
+                // 定期切换图片
+                switchImageRandomly(currentTime);
+                
+                // 如果不移动到中心，应用物理效果
+                if (!isMovingToCenter) {
+                    // 应用重力
+                    velocityY += gravity;
+                    
+                    // 应用摩擦力（在地面上）或空气阻力（在空中）
+                    if (y >= container.offsetHeight - pet.offsetHeight - 20 - 1) {
+                        // 在地面上
+                        velocityX *= friction;
+                        velocityY *= friction;
+                    } else {
+                        // 在空中
+                        velocityX *= airResistance;
+                        velocityY *= airResistance;
+                    }
+                    
+                    // 如果速度很小，就停止运动
+                    if (Math.abs(velocityX) < 0.05 && Math.abs(velocityY) < 0.05 && !isDragging) {
+                        velocityX = 0;
+                        velocityY = 0;
+                    }
+                    
+                    // 更新位置
+                    x += velocityX;
+                    y += velocityY;
+                    
+                    // 边界检测和碰撞处理
+                    let collisionType = null;
+                    let impactStrength = 0;
+                    
+                    if (x < 0) {
+                        impactStrength = Math.abs(velocityX);
+                        x = 0;
+                        collisionType = 'left';
+                    } else if (x > container.offsetWidth - pet.offsetWidth) {
+                        impactStrength = Math.abs(velocityX);
+                        x = container.offsetWidth - pet.offsetWidth;
+                        collisionType = 'right';
+                    }
+                    
+                    if (y < 40) {
+                        impactStrength = Math.max(impactStrength, Math.abs(velocityY));
+                        y = 40;
+                        collisionType = 'top';
+                    } else if (y > container.offsetHeight - pet.offsetHeight - 20) {
+                        impactStrength = Math.max(impactStrength, Math.abs(velocityY));
+                        y = container.offsetHeight - pet.offsetHeight - 20;
+                        collisionType = 'bottom';
+                    }
+                    
+                    // 如果有碰撞，处理碰撞效果
+                    if (collisionType && impactStrength > 0.2) {
+                        handleCollision(collisionType, impactStrength);
+                    }
+                    
+                    // 应用新位置
+                    pet.style.left = x + 'px';
+                    pet.style.top = y + 'px';
+                    
+                    // 根据速度改变表情
+                    const speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+                    
+                    if (speed < 0.5) {
+                        // 平静状态
+                        updateExpression(0);
+                    } else if (speed < 3) {
+                        // 移动状态
+                        updateExpression(1);
+                    } else {
+                        // 快速移动状态
+                        updateExpression(2);
+                    }
+                }
+                
+                // 继续动画
+                requestAnimationFrame(updatePosition);
+            }
+            
+            // 鼠标互动
+            let isDragging = false;
+            let dragStartX, dragStartY;
+            let initialX, initialY;
+            
+            // 更新鼠标互动时间
+            function updateMouseInteractionTime() {
+                lastMouseInteractionTime = Date.now();
+            }
+            
+            // 防止容器内文本选择
+            container.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                updateMouseInteractionTime();
+            });
+            
+            // 防止图片被拖拽
+            petImages.forEach(img => {
+                img.addEventListener('dragstart', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+            
+            // 全局鼠标移动监听
+            document.addEventListener('mousemove', function() {
+                updateMouseInteractionTime();
+            });
+            
+            pet.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                isDragging = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                initialX = x;
+                initialY = y;
+                
+                // 改变光标样式
+                pet.style.cursor = 'grabbing';
+                
+                // 显示点击对话气泡
+                if (Math.random() < 0.7) {
+                    showSpeechBubble('click');
+                }
+                
+                updateMouseInteractionTime();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    x = initialX + (e.clientX - dragStartX);
+                    y = initialY + (e.clientY - dragStartY);
+                    
+                    // 限制在容器内
+                    x = Math.max(0, Math.min(container.offsetWidth - pet.offsetWidth, x));
+                    y = Math.max(40, Math.min(container.offsetHeight - pet.offsetHeight - 20, y));
+                    
+                    pet.style.left = x + 'px';
+                    pet.style.top = y + 'px';
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            document.addEventListener('mouseup', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    isDragging = false;
+                    
+                    // 恢复光标样式
+                    pet.style.cursor = 'pointer';
+                    
+                    // 设置释放时的速度 - 大幅增加速度系数，使拖拽更轻松
+                    velocityX = (x - initialX) * 1.2; // 从0.8增加到1.2
+                    velocityY = (y - initialY) * 1.2; // 从0.8增加到1.2
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            // 鼠标靠近时的反应
+            container.addEventListener('mousemove', function(e) {
+                const rect = container.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const petCenterX = x + pet.offsetWidth / 2;
+                const petCenterY = y + pet.offsetHeight / 2;
+                
+                const distance = Math.sqrt(
+                    Math.pow(mouseX - petCenterX, 2) + 
+                    Math.pow(mouseY - petCenterY, 2)
+                );
+                
+                // 如果鼠标靠近桌宠
+                if (distance < 120 && !isDragging && !isMovingToCenter) {
+                    // 远离鼠标
+                    const angle = Math.atan2(petCenterY - mouseY, petCenterX - mouseX);
+                    const force = Math.min(15, (120 - distance) / 8);
+                    
+                    velocityX += Math.cos(angle) * force * 0.2;
+                    velocityY += Math.sin(angle) * force * 0.2;
+                    
+                    updateMouseInteractionTime();
+                }
+            });
+            
+            // 开始动画
+            requestAnimationFrame(updatePosition);
+        });
+    </script>
+</body>
+</html>

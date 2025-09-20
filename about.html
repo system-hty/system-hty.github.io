@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" data-theme="dark">
+<html lang="zh" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>关于 - SYSTEM-HTY</title>
@@ -11,6 +11,9 @@
     <!-- 浏览器图标 (Favicon) -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -24,14 +27,15 @@
             --card-bg: rgba(255, 255, 255, 0.92);
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
             --transition: all 0.3s ease;
-            --nav-bg: rgba(52, 152, 219, 0.8);
+            --nav-bg: rgba(255, 255, 255, 0.95);
             --border-color: #ddd;
+            --scoin-color: #9c27b0;
         }
 
         [data-theme="dark"] {
-            --text-color: #f0f0f0;
-            --text-light: #aaa;
-            --light-color: #1a1a2a;
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
             --card-bg: #1e1e1e;
             --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
             --primary-color: #64b5f6;
@@ -40,31 +44,39 @@
             --dark-color: #f5f5f5;
             --nav-bg: rgba(30, 30, 30, 0.95);
             --border-color: #444;
+            --scoin-color: #ba68c8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body, html {
             height: 100%;
             margin: 0;
-            font-family: 'Microsoft YaHei', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-color);
             scroll-behavior: smooth;
-            transition: var(--transition);
             background-color: var(--light-color);
+            line-height: 1.6;
         }
-        
-        /* 加载动画 */
+
         .loader {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: var(--light-color);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            transition: opacity 0.5s ease;
         }
+
         .loader-spinner {
             width: 50px;
             height: 50px;
@@ -74,215 +86,315 @@
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         .loader.hidden {
-            opacity: 0;
+            animation: fadeOut 0.5s forwards;
             pointer-events: none;
         }
-        
-        /* 背景图样式 */
-        #bg {
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .top-nav {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            z-index: -1;
-            opacity: 0.9;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
         }
-        
-        /* 顶部控制区域（搜索和主题切换） */
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 20;
+
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        /* 搜索框样式 */
-        .search-container {
-            position: relative;
-        }
-        
-        .search-box {
-            padding: 8px 15px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            width: 200px;
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
             transition: var(--transition);
-            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
         }
-        
-        .search-box:focus {
-            width: 250px;
-            outline: none;
-            box-shadow: 0 0 8px var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        /* 主题切换按钮 */
-        .theme-toggle {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 6px 12px;
-            cursor: pointer;
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
             transition: var(--transition);
-            color: var(--text-color);
-            white-space: nowrap;
         }
-        
-        .theme-toggle:hover {
-            background: var(--primary-color);
-            color: white;
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            transition: var(--transition);
         }
-        
-        /* 右上角导航栏 */
-        .top-nav {
-            position: absolute;
-            top: 20px;
-            right: 320px;
-            z-index: 20;
+
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
             display: flex;
             gap: 15px;
         }
-        
+
         .nav-link {
             padding: 8px 15px;
             background-color: var(--nav-bg);
-            color: white !important;
+            color: var(--dark-color) !important;
             border-radius: 4px;
             text-decoration: none;
             transition: var(--transition);
             font-weight: bold;
             border: 1px solid var(--border-color);
         }
-        
+
         .nav-link:hover {
             background-color: var(--primary-color);
-            text-decoration: none;
+            color: white !important;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
-        /* 右上角图片样式 */
-        .corner-image {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 150px;
-            height: 150px;
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            box-shadow: var(--shadow);
-            z-index: 10;
-            border: none;
-            transition: transform 0.3s;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border: 3px solid var(--primary-color);
         }
-        
-        .corner-image:hover {
-            transform: scale(1.05);
-        }
-        
-        /* 时间显示样式 */
-        .time-display {
-            text-align: center;
-            margin: 15px 0 25px;
-            font-size: 1.2em;
+
+        .user-name {
             color: var(--dark-color);
             font-weight: bold;
-            font-family: 'Courier New', monospace;
-            background-color: var(--card-bg);
-            padding: 8px 15px;
-            border-radius: 6px;
-            display: inline-block;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
         }
-        
-        .time-display:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+        .scoin-mini {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--scoin-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
         }
-        
-        /* 内容容器样式 */
+
+        .scoin-mini i {
+            margin-right: 5px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+
         .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+
+        .section {
             background: var(--card-bg);
-            max-width: 900px;
-            margin: 60px auto;
-            padding: 30px;
             border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
             box-shadow: var(--shadow);
-            position: relative;
-            color: var(--text-color);
-            transition: var(--transition);
             border: 1px solid var(--border-color);
         }
-        
-        .container:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* 文字样式 */
+
         h1, h2, h3 {
             color: var(--dark-color);
             margin-top: 0;
-            transition: color 0.3s;
         }
-        
-        h1 {
+
+        h2 {
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
-            text-align: center;
-            position: relative;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--secondary-color);
-            transition: var(--transition);
-            transform: translateX(-50%);
-        }
-        
-        h1:hover::after {
-            width: 100%;
-        }
-        
+
         p, li {
             line-height: 1.6;
             color: var(--text-color);
         }
-        
+
         a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
-            transition: var(--transition);
         }
-        
+
         a:hover {
             text-decoration: underline;
             color: var(--secondary-color);
-            transform: translateY(-1px);
         }
-        
-        /* B站图标样式 */
+
+        .scoin-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--scoin-color);
+            box-shadow: var(--shadow);
+        }
+
+        .scoin-balance {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .scoin-count {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--scoin-color);
+        }
+
+        .scoin-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-scoin {
+            background-color: var(--scoin-color);
+            color: white;
+        }
+
+        .btn-scoin:hover {
+            background-color: #7b1fa2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-scoin:disabled {
+            background-color: #b39ddb;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .scoin-info {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background-color: #ffd700;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .contact-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .contact-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+
         .bilibili-link {
             display: inline-flex;
             align-items: center;
@@ -293,56 +405,105 @@
             border-radius: 4px;
             transition: var(--transition);
         }
-        
+
         .bilibili-link:hover {
             background-color: #ff9db5;
-            text-decoration: none;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
-        /* 内容区块样式 */
-        section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
             transition: var(--transition);
         }
-        
-        section:hover {
-            border-color: var(--primary-color);
+
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--scoin-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification-icon {
+            color: var(--scoin-color);
+            font-size: 1.5rem;
         }
         
-        section:last-child {
-            border-bottom: none;
+        /* ===== 关于页面特有样式 ===== */
+        .about-header {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 20px;
         }
         
-        ul {
-            padding-left: 20px;
+        .about-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--primary-color);
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
         
-        li {
-            margin-bottom: 8px;
-            position: relative;
-            padding-left: 20px;
-            color: var(--text-color);
+        .about-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
-        li::before {
-            content: "•";
-            color: var(--primary-color);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-            transition: var(--transition);
+        .about-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--dark-color);
         }
         
-        li:hover::before {
-            color: var(--secondary-color);
-            transform: scale(1.5);
+        .about-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
         }
         
-        /* 技能进度条 */
         .skill-bar {
             margin: 15px 0;
         }
@@ -367,7 +528,6 @@
             transition: width 1s ease-in-out;
         }
         
-        /* 时间线样式 */
         .timeline {
             position: relative;
             padding-left: 30px;
@@ -407,21 +567,6 @@
             margin-bottom: 5px;
         }
         
-        /* 页脚样式 */
-        footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-            text-align: center;
-            color: var(--text-light);
-            transition: var(--transition);
-        }
-        
-        footer:hover {
-            border-color: var(--primary-color);
-        }
-        
-        /* 面包屑导航 */
         .breadcrumb {
             padding: 10px 0;
             margin-bottom: 20px;
@@ -444,7 +589,6 @@
             font-weight: bold;
         }
         
-        /* 回到顶部按钮 */
         #backToTop {
             display: none;
             position: fixed;
@@ -469,184 +613,210 @@
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
         
-        /* 响应式设计 */
-        @media (max-width: 900px) {
-            .container {
-                max-width: 95%;
-                margin: 50px auto;
-            }
-            
-            .top-nav {
-                right: 280px;
-            }
-            
-            .corner-image {
-                width: 120px;
-                height: 120px;
-            }
+        .time-display {
+            text-align: center;
+            margin: 15px 0 25px;
+            font-size: 1.2em;
+            color: var(--dark-color);
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 6px;
+            display: inline-block;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
         }
         
+        .time-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== 移动设备适配 ===== */
         @media (max-width: 768px) {
-            .top-controls {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin: 10px 0;
-                width: 100%;
+            .top-nav {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 15px;
             }
             
-            .top-nav {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                top: auto;
-                background: var(--card-bg);
-                padding: 10px;
-                justify-content: space-around;
-                flex-direction: row;
-                gap: 5px;
-                right: 0;
-                border-top: 1px solid var(--border-color);
+            .brand {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
             }
             
             .nav-link {
-                padding: 8px 12px;
-                font-size: 0.9em;
                 flex: 1;
+                min-width: 120px;
+                margin: 5px;
                 text-align: center;
             }
             
-            .corner-image {
-                width: 100px;
-                height: 100px;
-                top: 10px;
-                right: 10px;
-            }
-            
-            h1 {
-                font-size: 1.5em;
-            }
-            
-            .container {
-                margin: 70px 10px 80px;
-                padding: 20px;
-            }
-            
-            .time-display {
-                font-size: 1em;
-                padding: 6px 12px;
-            }
-            
-            .search-box {
+            .user-status {
                 width: 100%;
-            }
-            
-            .search-box:focus {
-                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
             }
             
             .theme-toggle {
-                width: 100%;
-                text-align: center;
-            }
-            
-            #backToTop {
-                bottom: 80px;
+                top: 80px;
                 right: 15px;
-            }
-        }
-
-        /* 高性能动画 */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* 打印样式 */
-        @media print {
-            .top-nav, .top-controls, #backToTop {
-                display: none;
             }
             
             .container {
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
+                margin-top: 180px;
             }
             
-            #bg {
-                display: none;
+            #authButtons {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
             }
             
-            .corner-image {
-                width: 100px;
-                height: 100px;
+            #authButtons .nav-link {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+            }
+            
+            .about-header {
+                padding: 20px 0;
+            }
+            
+            .about-avatar {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .about-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* 在更小的屏幕上进一步调整 */
+        @media (max-width: 480px) {
+            .nav-link {
+                min-width: 100px;
+                font-size: 0.85rem;
+                padding: 6px 10px;
+            }
+            
+            .theme-toggle {
+                top: 100px;
+            }
+            
+            .container {
+                margin-top: 200px;
+            }
+            
+            .about-title {
+                font-size: 1.8rem;
+            }
+            
+            .about-subtitle {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- 加载动画 -->
     <div class="loader" id="loader">
         <div class="loader-spinner"></div>
         <p>加载中...</p>
     </div>
     
-    <!-- 背景图区域 -->
-    <div id="bg"></div>
+    <div class="notification" id="notification">
+        <i class="fas fa-coins notification-icon"></i>
+        <span id="notificationText"></span>
+    </div>
     
-    <!-- 顶部控制区域（搜索和主题切换） -->
-    <div class="top-controls">
-        <!-- 搜索框 -->
-        <div class="search-container">
-            <input type="text" class="search-box" placeholder="搜索..." id="searchInput">
-            <div class="search-results" id="searchResults"></div>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
         </div>
         
-        <!-- 主题切换按钮 -->
-        <button class="theme-toggle" id="themeToggle">🌓 切换主题</button>
-    </div>
-    
-    <!-- 右上角导航 -->
-    <div class="top-nav">
-        <a href="index.html" class="nav-link">主页</a>
-        <a href="download.html" class="nav-link">下载</a>
-        <a href="index.html#projects" class="nav-link">项目</a>
-        <a href="about.html" class="nav-link">关于</a>
-    </div>
-    
-    <!-- 内容区域 -->
-    <div class="container">
-        <!-- 右上角头像 -->
-        <img class="corner-image" src="images/avatar.jpg" alt="SYSTEM-HTY头像" 
-             onerror="this.onerror=null; this.src='https://via.placeholder.com/150';">
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="index.html#projects" class="nav-link">
+                <i class="fas fa-project-diagram"></i> 项目
+            </a>
+            <a href="about.html" class="nav-link active">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+        </div>
         
-        <!-- 面包屑导航 -->
+        <div id="authButtons">
+            <a href="#" class="nav-link" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+            <a href="#" class="nav-link" id="registerBtn">
+                <i class="fas fa-user-plus"></i> 注册
+            </a>
+        </div>
+        
+        <div id="userStatus" class="user-status" style="display: none;">
+            <div class="user-avatar" id="userAvatar"></div>
+            <span class="user-name" id="userName"></span>
+            <span class="scoin-mini">
+                <i class="fas fa-coins"></i> <span id="scoinCount">0</span>
+            </span>
+            <a href="PersonalHomepage.html" class="nav-link" title="个人主页">
+                <i class="fas fa-home"></i>
+            </a>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="about-header">
+            <div class="about-avatar">
+                <img src="images/avatar.jpg" alt="SYSTEM-HTY头像" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'">
+            </div>
+            <h1 class="about-title">SYSTEM-HTY</h1>
+            <p class="about-subtitle">Python开发者 | 技术爱好者 | 工具创造者</p>
+            
+            <div class="time-display" id="current-time"></div>
+        </div>
+        
         <div class="breadcrumb">
             <a href="index.html">首页</a> &gt; <span>关于我</span>
         </div>
-
-        <header>
-            <h1>关于 SYSTEM-HTY</h1>
-            <p>Python开发者 | 技术爱好者 | 工具创造者</p>
-            
-            <!-- 时间显示 -->
-            <div class="time-display" id="current-time"></div>
-        </header>
-
-        <section id="intro">
+        
+        <div class="section">
             <h2>个人简介</h2>
             <p>你好！我是HTY，一名热爱编程的开发者，同时也是一名MMD创作者。我专注于Python开发，喜欢创造解决实际问题的工具。</p>
             <p>我的技术兴趣包括：Python编程、Web开发、自动化工具开发以及多媒体内容创作。</p>
-        </section>
-
-        <section id="skills">
+        </div>
+        
+        <div class="section">
             <h2>技术技能</h2>
             
             <div class="skill-bar">
@@ -688,9 +858,29 @@
                     <div class="skill-progress-bar" style="width: 80%"></div>
                 </div>
             </div>
-        </section>
-
-        <section id="experience">
+        </div>
+        
+        <div class="scoin-section">
+            <h2>S币系统</h2>
+            <div class="scoin-balance">
+                您的S币余额: <span class="scoin-count" id="scoinBalance">0</span>
+                <span id="adminBadge" class="admin-badge" style="display: none;">
+                    <i class="fas fa-crown"></i> 站长
+                </span>
+            </div>
+            
+            <div class="scoin-actions">
+                <button class="btn btn-scoin" id="claimScoinBtn">
+                    <i class="fas fa-gift"></i> 领取今日S币
+                </button>
+            </div>
+            
+            <div class="scoin-info" id="scoinInfo">
+                每天登录可领取1个S币
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>项目经历</h2>
             
             <div class="timeline">
@@ -712,9 +902,9 @@
                     <p>开发实时网络状态分析工具，帮助用户监控网络健康状况。</p>
                 </div>
             </div>
-        </section>
-
-        <section id="education">
+        </div>
+        
+        <div class="section">
             <h2>学习经历</h2>
             
             <div class="timeline">
@@ -730,105 +920,325 @@
                     <p>学习MikuMikuDance制作技术，创作多个原创作品。</p>
                 </div>
             </div>
-        </section>
-
-        <section id="contact">
+        </div>
+        
+        <div class="section">
             <h2>联系我</h2>
             <p>如果您对我的项目感兴趣或有任何合作意向，欢迎通过以下方式联系我：</p>
-            <p>邮箱：<a href="mailto:644043561@qq.com">644043561@qq.com</a></p>
-            <p>B站主页：<a class="bilibili-link" href="https://space.bilibili.com/3537109889583643?spm_id_from=333.788.0.0" target="_blank" rel="noopener">访问我的B站空间</a></p>
-        </section>
-
+            
+            <div class="contact-methods">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-title">邮箱</div>
+                    <a href="mailto:644043561@qq.com" class="contact-link">644043561@qq.com</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fab fa-bilibili"></i>
+                    </div>
+                    <div class="contact-title">B站</div>
+                    <a href="https://space.bilibili.com/3537109889583643?spm_id_from=333.788.0.0" class="contact-link bilibili-link" target="_blank">访问我的B站空间</a>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <div class="contact-title">GitHub</div>
+                    <a href="https://github.com/SYSTEM-HTY" class="contact-link" target="_blank">查看我的代码仓库</a>
+                </div>
+            </div>
+        </div>
+        
         <footer>
             <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
             <p>本网站使用HTML5、CSS3和JavaScript构建</p>
-            <p>加载时间: <span id="loadTime"></span> 毫秒</p>
+            <p>最后更新: 2023-10-15 | 加载时间: <span id="loadTime"></span> 毫秒</p>
         </footer>
     </div>
     
-    <!-- 回到顶部按钮 -->
     <button id="backToTop" title="回到顶部">↑</button>
 
     <script>
-        // 页面加载完成后隐藏加载动画
+        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 确保页面内容已加载
             setTimeout(function() {
-                var loader = document.getElementById('loader');
-                if (loader) {
-                    loader.classList.add('hidden');
+                try {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                    
+                    // 记录加载时间
+                    var loadTime = performance.now();
+                    document.getElementById('loadTime').textContent = Math.round(loadTime);
+                    
+                    // 初始化Netlify Identity
+                    initNetlifyIdentity();
+                    
+                    // 初始化主题切换
+                    initThemeToggle();
+                    
+                    // 初始化时间显示
+                    initTimeDisplay();
+                    
+                    // 初始化回到顶部按钮
+                    initBackToTop();
+                    
+                    // 初始化技能条动画
+                    animateSkillBars();
+                } catch (error) {
+                    console.error('初始化出错:', error);
                 }
-                
-                // 记录加载时间
-                var loadTime = performance.now();
-                var loadTimeElement = document.getElementById('loadTime');
-                if (loadTimeElement) {
-                    loadTimeElement.textContent = Math.round(loadTime);
-                }
-                
-                // 初始化进度条动画
-                animateSkillBars();
             }, 500);
         });
 
-        // 时间显示功能
-        function updateTime() {
-            var now = new Date();
-            var year = now.getFullYear();
-            var month = String(now.getMonth() + 1).padStart(2, '0');
-            var day = String(now.getDate()).padStart(2, '0');
-            var hours = String(now.getHours()).padStart(2, '0');
-            var minutes = String(now.getMinutes()).padStart(2, '0');
-            var seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            var timeElement = document.getElementById('current-time');
-            if (timeElement) {
-                timeElement.textContent = year + '/' + month + '/' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        // Netlify Identity初始化
+        function initNetlifyIdentity() {
+            if (window.netlifyIdentity) {
+                netlifyIdentity.on('init', user => {
+                    updateUI(user);
+                    if (user) {
+                        getScoinData(user);
+                    }
+                });
+                
+                netlifyIdentity.on('login', user => {
+                    updateUI(user);
+                    getScoinData(user);
+                    netlifyIdentity.close();
+                });
+                
+                netlifyIdentity.on('logout', () => {
+                    updateUI(null);
+                });
+                
+                netlifyIdentity.on('error', err => {
+                    console.error('Netlify Identity错误:', err);
+                    showNotification('身份验证错误: ' + err.message);
+                });
+                
+                // 绑定登录按钮
+                document.getElementById('loginBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.open('login');
+                });
+                
+                // 绑定注册按钮
+                document.getElementById('registerBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.open('signup');
+                });
+                
+                // 绑定退出按钮
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.logout();
+                });
+                
+                // 绑定领取按钮
+                document.getElementById('claimScoinBtn').addEventListener('click', function() {
+                    const user = netlifyIdentity.currentUser();
+                    if (user) {
+                        claimScoin(user);
+                    } else {
+                        showNotification('请先登录后领取S币');
+                    }
+                });
+                
+                netlifyIdentity.init();
             }
         }
         
-        // 初始更新
-        updateTime();
-        
-        // 每秒更新一次
-        setInterval(updateTime, 1000);
-        
-        // 回到顶部功能
-        var backBtn = document.getElementById('backToTop');
-        if (backBtn) {
-            window.addEventListener('scroll', function() {
-                backBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
-            });
+        // 更新用户界面
+        function updateUI(user) {
+            const authButtons = document.getElementById('authButtons');
+            const userStatus = document.getElementById('userStatus');
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const scoinCount = document.getElementById('scoinCount');
+            const adminBadge = document.getElementById('adminBadge');
             
-            backBtn.addEventListener('click', function() {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-        
-        // 主题切换功能
-        var themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            // 检查本地存储的主题设置
-            if (localStorage.getItem('theme') === 'light') {
-                document.documentElement.removeAttribute('data-theme');
-                themeToggle.textContent = '🌓 切换暗色';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '🌓 切换亮色';
-            }
-            
-            themeToggle.addEventListener('click', function() {
-                var currentTheme = document.documentElement.getAttribute('data-theme');
-                if (currentTheme === 'dark') {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                    themeToggle.textContent = '🌓 切换暗色';
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                    themeToggle.textContent = '🌓 切换亮色';
+            if (user) {
+                // 用户已登录
+                authButtons.style.display = 'none';
+                userStatus.style.display = 'flex';
+                
+                // 设置用户信息
+                const name = user.user_metadata.full_name || user.email;
+                userName.textContent = name;
+                
+                // 设置用户头像
+                const initial = name.charAt(0).toUpperCase();
+                userAvatar.textContent = initial;
+                
+                // 检查是否是站长
+                if (user.email === '644043561@qq.com') {
+                    adminBadge.style.display = 'inline-block';
                 }
-            });
+            } else {
+                // 用户未登录
+                authButtons.style.display = 'flex';
+                userStatus.style.display = 'none';
+                scoinCount.textContent = '0';
+                document.getElementById('scoinBalance').textContent = '0';
+                document.getElementById('scoinInfo').textContent = '请登录后领取S币';
+                adminBadge.style.display = 'none';
+            }
+        }
+        
+        // 获取S币数据
+        async function getScoinData(user) {
+            try {
+                const response = await fetch('/.netlify/functions/get-scoin', {
+                    headers: {
+                        'Authorization': 'Bearer ' + user.token.access_token
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('获取S币数据失败');
+                }
+                
+                const data = await response.json();
+                
+                // 更新显示
+                document.getElementById('scoinBalance').textContent = data.balance;
+                document.getElementById('scoinCount').textContent = data.balance;
+                
+                // 检查今天是否已经领取
+                const today = new Date().toISOString().split('T')[0];
+                if (data.lastClaimDate === today) {
+                    document.getElementById('claimScoinBtn').disabled = true;
+                    document.getElementById('claimScoinBtn').innerHTML = '<i class="fas fa-check"></i> 今日已领取';
+                    document.getElementById('scoinInfo').textContent = '您今天已经领取过S币了，明天再来吧！';
+                } else {
+                    document.getElementById('claimScoinBtn').disabled = false;
+                    document.getElementById('claimScoinBtn').innerHTML = '<i class="fas fa-gift"></i> 领取今日S币';
+                    document.getElementById('scoinInfo').textContent = '每天登录可领取1个S币';
+                }
+            } catch (error) {
+                console.error('获取S币数据时出错:', error);
+                showNotification('获取S币数据失败: ' + error.message);
+            }
+        }
+        
+        // 领取S币
+        async function claimScoin(user) {
+            const btn = document.getElementById('claimScoinBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 领取中...';
+            
+            try {
+                const response = await fetch('/.netlify/functions/claim-scoin', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + user.token.access_token
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('领取S币失败');
+                }
+                
+                const data = await response.json();
+                
+                // 更新显示
+                document.getElementById('scoinBalance').textContent = data.balance;
+                document.getElementById('scoinCount').textContent = data.balance;
+                btn.innerHTML = '<i class="fas fa-check"></i> 今日已领取';
+                document.getElementById('scoinInfo').textContent = '您今天已经领取过S币了，明天再来吧！';
+                
+                // 显示通知
+                showNotification('成功领取S币！');
+            } catch (error) {
+                console.error('领取S币时出错:', error);
+                showNotification('领取失败: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-gift"></i> 领取今日S币';
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化主题切换
+        function initThemeToggle() {
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // 检查本地存储的主题设置
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        this.innerHTML = '<i class="fas fa-moon"></i>';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        this.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                });
+            }
+        }
+        
+        // 时间显示功能
+        function initTimeDisplay() {
+            function updateTime() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = String(now.getMonth() + 1).padStart(2, '0');
+                var day = String(now.getDate()).padStart(2, '0');
+                var hours = String(now.getHours()).padStart(2, '0');
+                var minutes = String(now.getMinutes()).padStart(2, '0');
+                var seconds = String(now.getSeconds()).padStart(2, '0');
+                
+                var timeElement = document.getElementById('current-time');
+                if (timeElement) {
+                    timeElement.textContent = year + '/' + month + '/' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+                }
+            }
+            
+            // 初始更新
+            updateTime();
+            
+            // 每秒更新一次
+            setInterval(updateTime, 1000);
+        }
+        
+        // 初始化回到顶部按钮
+        function initBackToTop() {
+            var backBtn = document.getElementById('backToTop');
+            if (backBtn) {
+                window.addEventListener('scroll', function() {
+                    backBtn.style.display = window.scrollY > 300 ? 'block' : 'none';
+                });
+                
+                backBtn.addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
         }
         
         // 进度条动画
@@ -842,24 +1252,6 @@
                 }, 500);
             });
         }
-        
-        // 添加错误处理，防止JavaScript错误导致页面无法正常加载
-        window.addEventListener('error', function(e) {
-            console.error('JavaScript错误:', e.error);
-            // 确保即使有错误，加载动画也会被隐藏
-            var loader = document.getElementById('loader');
-            if (loader && !loader.classList.contains('hidden')) {
-                loader.classList.add('hidden');
-            }
-        });
-
-        // 确保页面完全加载后隐藏加载动画
-        window.addEventListener('load', function() {
-            var loader = document.getElementById('loader');
-            if (loader && !loader.classList.contains('hidden')) {
-                loader.classList.add('hidden');
-            }
-        });
     </script>
 </body>
 </html>
