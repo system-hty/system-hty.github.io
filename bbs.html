@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM-HTY - 开发者论坛</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 使用与主站相同的CSS变量和基础样式 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+            --github-color: #333;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+            --scoin-color: #ba68c8;
+            --github-color: #f5f5f5;
+        }
+
+        /* 基础样式与index.html相同 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader.hidden {
+            animation: fadeOut 0.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 品牌标志样式 */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            transition: var(--transition);
+        }
+
+        /* 导航栏悬停效果 */
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: var(--dark-color) !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+
+        .scoin-mini {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--scoin-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .scoin-mini i {
+            margin-right: 5px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--dark-color);
+            margin-top: 0;
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        p, li {
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
+        /* 论坛特定样式 */
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .forum-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .forum-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-left-color: var(--secondary-color);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-icon {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-right: 15px;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .category-desc {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .category-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .threads-list {
+            margin-top: 30px;
+        }
+
+        .thread-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .thread-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .thread-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .thread-content {
+            flex-grow: 1;
+        }
+
+        .thread-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .thread-meta {
+            display: flex;
+            gap: 15px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .thread-excerpt {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .thread-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 80px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .thread-views, .thread-replies {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .badge-pinned {
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        .badge-hot {
+            background-color: #ff5252;
+            color: white;
+        }
+
+        .badge-new {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-github {
+            background-color: var(--github-color);
+            color: white;
+        }
+
+        .btn-github:hover {
+            background-color: #24292e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .pagination-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .pagination-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .pagination-item:hover:not(.active) {
+            background-color: var(--border-color);
+        }
+
+        .new-thread-form {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #bdc3c7;
+        }
+
+        /* 登录模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 移动设备适配 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .brand {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .brand-logo {
+                height: 35px;
+            }
+            
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            
+            .container {
+                margin: 120px 10px 40px;
+                padding: 15px;
+            }
+            
+            .forum-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .forum-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .forum-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .thread-item {
+                flex-direction: column;
+            }
+            
+            .thread-stats {
+                flex-direction: row;
+                justify-content: flex-start;
+                gap: 15px;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>加载中...</p>
+    </div>
+    
+    <!-- 登录模态框 -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>登录论坛</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="login-options">
+                <button class="btn btn-github" id="githubLoginBtn">
+                    <i class="fab fa-github"></i> 使用GitHub登录
+                </button>
+                <p style="text-align: center; margin-top: 15px; color: var(--text-light);">
+                    通过GitHub账号快速登录论坛
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="bbs.html" class="nav-link active">
+                <i class="fas fa-comments"></i> 论坛
+            </a>
+            <a href="about.html" class="nav-link">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+            <a href="donate.html" class="nav-link">
+                <i class="fas fa-donate"></i> 捐献
+            </a>
+        </div>
+        
+        <div id="authButtons">
+            <a href="#" class="nav-link" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+        </div>
+        
+        <div id="userStatus" class="user-status" style="display: none;">
+            <div class="user-avatar" id="userAvatar">
+                <img id="userAvatarImg" src="" alt="用户头像">
+            </div>
+            <span class="user-name" id="userName"></span>
+            <a href="PersonalHomepage.html" class="nav-link" title="个人主页">
+                <i class="fas fa-home"></i>
+            </a>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="section">
+            <div class="forum-header">
+                <h1>开发者论坛</h1>
+                <div class="forum-stats">
+                    <span><i class="fas fa-users"></i> 在线用户: 24</span>
+                    <span><i class="fas fa-comments"></i> 帖子总数: 1,245</span>
+                    <span><i class="fas fa-user"></i> 注册用户: 568</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="newThreadBtn">
+                <i class="fas fa-plus"></i> 发布新帖
+            </button>
+            
+            <div class="new-thread-form" id="newThreadForm">
+                <h3>发布新主题</h3>
+                <div class="form-group">
+                    <label class="form-label" for="threadTitle">标题</label>
+                    <input type="text" class="form-input" id="threadTitle" placeholder="请输入标题">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="threadCategory">分类</label>
+                    <select class="form-select" id="threadCategory">
+                        <option value="">请选择分类</option>
+                        <option value="python">Python开发</option>
+                        <option value="web">Web前端</option>
+                        <option value="tools">工具分享</option>
+                        <option value="qa">问题求助</option>
+                        <option value="feedback">反馈建议</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="threadContent">内容</label>
+                    <textarea class="form-textarea" id="threadContent" placeholder="请输入内容..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" id="cancelThreadBtn">取消</button>
+                    <button class="btn btn-primary" id="submitThreadBtn">发布</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>论坛分类</h2>
+            <div class="forum-categories">
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <div class="category-title">Python开发</div>
+                    </div>
+                    <div class="category-desc">
+                        讨论Python编程语言相关话题，包括Django、Flask等框架使用经验。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 342</span>
+                        <span>帖子: 1,245</span>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="category-title">Web前端</div>
+                    </div>
+                    <div class="category-desc">
+                        HTML、CSS、JavaScript等前端技术讨论，分享开发经验和资源。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 189</span>
+                        <span>帖子: 756</span>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="category-title">工具分享</div>
+                    </div>
+                    <div class="category-desc">
+                        分享实用的开发工具、软件和资源，提高开发效率。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 156</span>
+                        <span>帖子: 423</span>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="category-title">问题求助</div>
+                    </div>
+                    <div class="category-desc">
+                        遇到技术难题？在这里寻求帮助，社区成员互助解答。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 278</span>
+                        <span>帖子: 892</span>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="category-title">反馈建议</div>
+                    </div>
+                    <div class="category-desc">
+                        对SYSTEM-HTY项目的反馈和改进建议，帮助我们做得更好。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 87</span>
+                        <span>帖子: 204</span>
+                    </div>
+                </div>
+                
+                <div class="category-card">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="category-title">闲聊区</div>
+                    </div>
+                    <div class="category-desc">
+                        非技术话题讨论区，分享生活点滴，结交志同道合的朋友。
+                    </div>
+                    <div class="category-meta">
+                        <span>主题: 112</span>
+                        <span>帖子: 567</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="forum-header">
+                <h2>最新帖子</h2>
+                <div class="forum-stats">
+                    <span><i class="fas fa-filter"></i> 排序: 最新</span>
+                </div>
+            </div>
+            
+            <div class="threads-list">
+                <div class="thread-item">
+                    <div class="thread-avatar">H</div>
+                    <div class="thread-content">
+                        <div class="thread-title">
+                            <span class="badge badge-pinned">置顶</span>
+                            Python 3.11新特性解析及性能测试
+                        </div>
+                        <div class="thread-meta">
+                            <span><i class="fas fa-user"></i> SYSTEM-HTY</span>
+                            <span><i class="fas fa-clock"></i> 2小时前</span>
+                            <span><i class="fas fa-folder"></i> Python开发</span>
+                        </div>
+                        <div class="thread-excerpt">
+                            本文详细介绍了Python 3.11版本的新特性，特别是错误信息改进和性能提升方面...
+                        </div>
+                    </div>
+                    <div class="thread-stats">
+                        <div class="thread-views"><i class="fas fa-eye"></i> 245</div>
+                        <div class="thread-replies"><i class="fas fa-comment"></i> 32</div>
+                    </div>
+                </div>
+                
+                <div class="thread-item">
+                    <div class="thread-avatar">T</div>
+                    <div class="thread-content">
+                        <div class="thread-title">
+                            <span class="badge badge-hot">热门</span>
+                            教学辅助工具v2.5版本发布！
+                        </div>
+                        <div class="thread-meta">
+                            <span><i class="fas fa-user"></i> TeacherWang</span>
+                            <span><i class="fas fa-clock"></i> 5小时前</span>
+                            <span><i class="fas fa-folder"></i> 工具分享</span>
+                        </div>
+                        <div class="thread-excerpt">
+                            最新版本增加了课堂互动功能和数据分析模块，欢迎下载使用并提供反馈...
+                        </div>
+                    </div>
+                    <div class="thread-stats">
+                        <div class="thread-views"><i class="fas fa-eye"></i> 189</div>
+                        <div class="thread-replies"><i class="fas fa-comment"></i> 28</div>
+                    </div>
+                </div>
+                
+                <div class="thread-item">
+                    <div class="thread-avatar">D</div>
+                    <div class="thread-content">
+                        <div class="thread-title">
+                            <span class="badge badge-new">新帖</span>
+                            数据备份助手使用问题求助
+                        </div>
+                        <div class="thread-meta">
+                            <span><i class="fas fa-user"></i> DataUser</span>
+                            <span><i class="fas fa-clock"></i> 昨天</span>
+                            <span><i class="fas fa-folder"></i> 问题求助</span>
+                        </div>
+                        <div class="thread-excerpt">
+                            在使用数据备份助手时遇到无法连接网络驱动器的问题，错误代码1024...
+                        </div>
+                    </div>
+                    <div class="thread-stats">
+                        <div class="thread-views"><i class="fas fa-eye"></i> 76</div>
+                        <div class="thread-replies"><i class="fas fa-comment"></i> 5</div>
+                    </div>
+                </div>
+                
+                <div class="thread-item">
+                    <div class="thread-avatar">W</div>
+                    <div class="thread-content">
+                        <div class="thread-title">
+                            Web前端框架选择：Vue vs React vs Angular
+                        </div>
+                        <div class="thread-meta">
+                            <span><i class="fas fa-user"></i> WebDev</span>
+                            <span><i class="fas fa-clock"></i> 2天前</span>
+                            <span><i class="fas fa-folder"></i> Web前端</span>
+                        </div>
+                        <div class="thread-excerpt">
+                            针对不同项目需求，如何选择最适合的前端框架？分享我的经验...
+                        </div>
+                    </div>
+                    <div class="thread-stats">
+                        <div class="thread-views"><i class="fas fa-eye"></i> 142</div>
+                        <div class="thread-replies"><i class="fas fa-comment"></i> 18</div>
+                    </div>
+                </div>
+                
+                <div class="thread-item">
+                    <div class="thread-avatar">P</div>
+                    <div class="thread-content">
+                        <div class="thread-title">
+                            PyInstaller打包问题：如何减少可执行文件大小？
+                        </div>
+                        <div class="thread-meta">
+                            <span><i class="fas fa-user"></i> PyPackager</span>
+                            <span><i class="fas fa-clock"></i> 3天前</span>
+                            <span><i class="fas fa-folder"></i> Python开发</span>
+                        </div>
+                        <div class="thread-excerpt">
+                            使用PyInstaller打包Python应用后文件过大，有哪些优化技巧可以减小体积？
+                        </div>
+                    </div>
+                    <div class="thread-stats">
+                        <div class="thread-views"><i class="fas fa-eye"></i> 98</div>
+                        <div class="thread-replies"><i class="fas fa-comment"></i> 7</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pagination">
+                <div class="pagination-item active">1</div>
+                <div class="pagination-item">2</div>
+                <div class="pagination-item">3</div>
+                <div class="pagination-item">...</div>
+                <div class="pagination-item">10</div>
+                <div class="pagination-item"><i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // 检查用户登录状态
+                checkLoginStatus();
+                
+                // 初始化论坛功能
+                initForum();
+                
+                // 初始化主题切换
+                initThemeToggle();
+                
+                // 隐藏加载动画
+                setTimeout(function() {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                }, 300);
+            } catch (error) {
+                console.error('初始化出错:', error);
+            }
+        });
+
+        // 初始化主题切换
+        function initThemeToggle() {
+            // 从localStorage获取主题设置
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+            
+            // 添加主题切换按钮（如果不存在）
+            if (!document.getElementById('themeToggle')) {
+                const themeToggle = document.createElement('button');
+                themeToggle.id = 'themeToggle';
+                themeToggle.className = 'nav-link';
+                themeToggle.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? 
+                    '<i class="fas fa-sun"></i> 浅色模式' : '<i class="fas fa-moon"></i> 深色模式';
+                
+                themeToggle.addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    
+                    themeToggle.innerHTML = newTheme === 'dark' ? 
+                        '<i class="fas fa-sun"></i> 浅色模式' : '<i class="fas fa-moon"></i> 深色模式';
+                });
+                
+                // 添加到导航栏
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    navLinks.appendChild(themeToggle);
+                }
+            }
+        }
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            const userData = localStorage.getItem('githubUser');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    updateUI(user);
+                } catch (e) {
+                    console.error('解析用户数据失败:', e);
+                    localStorage.removeItem('githubUser');
+                }
+            }
+        }
+        
+        // 更新用户界面
+        function updateUI(user) {
+            const authButtons = document.getElementById('authButtons');
+            const userStatus = document.getElementById('userStatus');
+            const userName = document.getElementById('userName');
+            const userAvatarImg = document.getElementById('userAvatarImg');
+            
+            if (user) {
+                // 用户已登录
+                authButtons.style.display = 'none';
+                userStatus.style.display = 'flex';
+                
+                // 设置用户信息
+                userName.textContent = user.name || user.login;
+                
+                // 设置用户头像
+                if (user.avatar_url) {
+                    userAvatarImg.src = user.avatar_url;
+                    userAvatarImg.alt = user.name || user.login;
+                }
+            } else {
+                // 用户未登录
+                authButtons.style.display = 'flex';
+                userStatus.style.display = 'none';
+            }
+        }
+        
+        // 初始化论坛功能
+        function initForum() {
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginModal = document.getElementById('loginModal');
+            const closeModal = document.getElementById('closeModal');
+            const githubLoginBtn = document.getElementById('githubLoginBtn');
+            const newThreadBtn = document.getElementById('newThreadBtn');
+            const newThreadForm = document.getElementById('newThreadForm');
+            const cancelThreadBtn = document.getElementById('cancelThreadBtn');
+            const submitThreadBtn = document.getElementById('submitThreadBtn');
+            
+            // 登录按钮点击事件
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginModal.style.display = 'flex';
+                });
+            }
+            
+            // 关闭模态框
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    loginModal.style.display = 'none';
+                });
+            }
+            
+            // 点击模态框外部关闭
+            if (loginModal) {
+                loginModal.addEventListener('click', function(e) {
+                    if (e.target === loginModal) {
+                        loginModal.style.display = 'none';
+                    }
+                });
+            }
+            
+            // GitHub登录按钮点击事件
+            if (githubLoginBtn) {
+                githubLoginBtn.addEventListener('click', function() {
+                    // 在实际应用中，这里应该重定向到GitHub OAuth页面
+                    startGitHubOAuth();
+                });
+            }
+            
+            // 退出登录
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('githubUser');
+                    updateUI(null);
+                    alert('已退出登录');
+                });
+            }
+            
+            // 显示/隐藏新帖子表单
+            if (newThreadBtn) {
+                newThreadBtn.addEventListener('click', function() {
+                    const userData = localStorage.getItem('githubUser');
+                    if (!userData) {
+                        alert('请先登录后再发布帖子');
+                        loginModal.style.display = 'flex';
+                        return;
+                    }
+                    
+                    newThreadForm.style.display = newThreadForm.style.display === 'block' ? 'none' : 'block';
+                });
+            }
+            
+            // 取消发布
+            if (cancelThreadBtn) {
+                cancelThreadBtn.addEventListener('click', function() {
+                    newThreadForm.style.display = 'none';
+                    document.getElementById('threadTitle').value = '';
+                    document.getElementById('threadCategory').value = '';
+                    document.getElementById('threadContent').value = '';
+                });
+            }
+            
+            // 提交新帖子
+            if (submitThreadBtn) {
+                submitThreadBtn.addEventListener('click', function() {
+                    const title = document.getElementById('threadTitle').value.trim();
+                    const category = document.getElementById('threadCategory').value;
+                    const content = document.getElementById('threadContent').value.trim();
+                    
+                    if (!title) {
+                        alert('请输入标题');
+                        return;
+                    }
+                    
+                    if (!category) {
+                        alert('请选择分类');
+                        return;
+                    }
+                    
+                    if (!content) {
+                        alert('请输入内容');
+                        return;
+                    }
+                    
+                    // 这里应该是提交到后端的代码
+                    // 暂时用模拟成功代替
+                    alert('帖子发布成功！');
+                    newThreadForm.style.display = 'none';
+                    document.getElementById('threadTitle').value = '';
+                    document.getElementById('threadCategory').value = '';
+                    document.getElementById('threadContent').value = '';
+                    
+                    // 在实际应用中，这里应该重新加载帖子列表或添加新帖子到列表顶部
+                });
+            }
+        }
+        
+        // 实际的GitHub OAuth登录函数
+        function startGitHubOAuth() {
+            // GitHub OAuth配置 - 需要替换为实际的Client ID
+            const clientId = '0a40e841bd9b3c297f9a'; // 示例ID，需要替换
+            const redirectUri = encodeURIComponent(`${window.location.origin}${window.location.pathname}`);
+            const scope = encodeURIComponent('read:user user:email');
+            
+            // 构建GitHub OAuth URL
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+            
+            // 重定向到GitHub授权页面
+            window.location.href = authUrl;
+        }
+        
+        // 处理GitHub OAuth回调
+        function handleGitHubCallback() {
+            // 从URL中获取code参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                // 显示加载状态
+                const githubLoginBtn = document.getElementById('githubLoginBtn');
+                if (githubLoginBtn) {
+                    githubLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+                    githubLoginBtn.disabled = true;
+                }
+                
+                // 使用code向服务器请求access token
+                // 注意：这里需要一个后端API来处理OAuth流程，因为不能在前端暴露Client Secret
+                fetch('https://api.yourserver.com/github-auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code, redirect_uri: window.location.origin + window.location.pathname })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('认证失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.access_token) {
+                        // 使用access token获取用户信息
+                        return fetch('https://api.github.com/user', {
+                            headers: {
+                                'Authorization': `token ${data.access_token}`
+                            }
+                        });
+                    } else {
+                        throw new Error('Failed to get access token');
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('获取用户信息失败');
+                    }
+                    return response.json();
+                })
+                .then(userData => {
+                    // 存储用户信息
+                    localStorage.setItem('githubUser', JSON.stringify(userData));
+                    
+                    // 更新UI
+                    updateUI(userData);
+                    
+                    // 清除URL中的code参数
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    // 关闭登录模态框
+                    document.getElementById('loginModal').style.display = 'none';
+                    
+                    alert('登录成功！欢迎 ' + (userData.name || userData.login));
+                })
+                .catch(error => {
+                    console.error('GitHub OAuth error:', error);
+                    alert('登录失败，请重试');
+                    
+                    // 恢复登录按钮状态
+                    const githubLoginBtn = document.getElementById('githubLoginBtn');
+                    if (githubLoginBtn) {
+                        githubLoginBtn.innerHTML = '<i class="fab fa-github"></i> 使用GitHub登录';
+                        githubLoginBtn.disabled = false;
+                    }
+                });
+            }
+        }
+        
+        // 页面加载时检查是否有OAuth回调代码
+        if (window.location.search.includes('code=')) {
+            handleGitHubCallback();
+        }
+    </script>
+</body>
+</html>

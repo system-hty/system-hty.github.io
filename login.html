@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM-HTY - 登录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 使用与主站相同的CSS变量和基础样式 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+            --github-color: #333;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+            --scoin-color: #ba68c8;
+            --github-color: #f5f5f5;
+        }
+
+        /* 基础样式与index.html相同 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader.hidden {
+            animation: fadeOut 0.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 品牌标志样式 */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            transition: var(--transition);
+        }
+
+        /* 导航栏悬停效果 */
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: var(--dark-color) !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+
+        .scoin-mini {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--scoin-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .scoin-mini i {
+            margin-right: 5px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+
+        /* 登录页面特定样式 */
+        .login-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 80px;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--light-color) 0%, #e0e0e0 100%);
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .login-logo {
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            height: 80px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .login-subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .github-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--github-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+
+        .github-login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background-color: #24292e;
+        }
+
+        .github-login-btn i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        .login-terms {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .login-terms a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .login-terms a:hover {
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .demo-note {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 0.9rem;
+            border-left: 4px solid #ffeeba;
+        }
+
+        .demo-note h4 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-note ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+
+        /* 移动设备适配 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .brand {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .brand-logo {
+                height: 35px;
+            }
+            
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            
+            .login-card {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .login-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>加载中...</p>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="bbs.html" class="nav-link">
+                <i class="fas fa-comments"></i> 论坛
+            </a>
+            <a href="about.html" class="nav-link">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+            <a href="donate.html" class="nav-link">
+                <i class="fas fa-donate"></i> 捐献
+            </a>
+        </div>
+        
+        <div id="authButtons">
+            <a href="bbs.html" class="nav-link">
+                <i class="fas fa-arrow-left"></i> 返回论坛
+            </a>
+        </div>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            
+            <h1 class="login-title">登录SYSTEM-HTY</h1>
+            <p class="login-subtitle">使用GitHub账号登录开发者论坛</p>
+            
+            <button class="github-login-btn" id="githubLoginBtn">
+                <i class="fab fa-github"></i> 使用GitHub登录
+            </button>
+            
+            <p class="login-terms">
+                点击"使用GitHub登录"即表示您同意我们的
+                <a href="#">服务条款</a>和<a href="#">隐私政策</a>
+            </p>
+            
+            <div class="demo-note">
+                <h4><i class="fas fa-info-circle"></i> 演示说明</h4>
+                <p>这是一个GitHub OAuth登录演示。由于OAuth流程需要服务器端支持，当前为模拟登录：</p>
+                <ul>
+                    <li>点击按钮将使用模拟用户数据登录</li>
+                    <li>实际部署时需要后端服务器处理OAuth流程</li>
+                    <li>您的GitHub Client ID: <code>Ov23liv4elLYx7XVnIQ3</code></li>
+                </ul>
+            </div>
+            
+            <div class="login-footer">
+                <p>SYSTEM-HTY开发者社区 &copy; 2023</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // 检查用户登录状态
+                checkLoginStatus();
+                
+                // 初始化主题切换
+                initThemeToggle();
+                
+                // 初始化登录功能
+                initLogin();
+                
+                // 隐藏加载动画
+                setTimeout(function() {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                }, 300);
+            } catch (error) {
+                console.error('初始化出错:', error);
+            }
+        });
+
+        // 初始化主题切换
+        function initThemeToggle() {
+            // 从localStorage获取主题设置
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+            
+            // 添加主题切换按钮（如果不存在）
+            if (!document.getElementById('themeToggle')) {
+                const themeToggle = document.createElement('button');
+                themeToggle.id = 'themeToggle';
+                themeToggle.className = 'nav-link';
+                themeToggle.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? 
+                    '<i class="fas fa-sun"></i> 浅色模式' : '<i class="fas fa-moon"></i> 深色模式';
+                
+                themeToggle.addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    
+                    themeToggle.innerHTML = newTheme === 'dark' ? 
+                        '<i class="fas fa-sun"></i> 浅色模式' : '<i class="fas fa-moon"></i> 深色模式';
+                });
+                
+                // 添加到导航栏
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    navLinks.appendChild(themeToggle);
+                }
+            }
+        }
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            const userData = localStorage.getItem('githubUser');
+            if (userData) {
+                try {
+                    // 如果用户已登录，直接跳转到论坛页面
+                    window.location.href = 'bbs.html';
+                } catch (e) {
+                    console.error('解析用户数据失败:', e);
+                    localStorage.removeItem('githubUser');
+                }
+            }
+        }
+        
+        // 初始化登录功能
+        function initLogin() {
+            const githubLoginBtn = document.getElementById('githubLoginBtn');
+            
+            // GitHub登录按钮点击事件
+            if (githubLoginBtn) {
+                githubLoginBtn.addEventListener('click', function() {
+                    // 在实际应用中，这里应该重定向到GitHub OAuth页面
+                    // 由于OAuth需要后端支持，这里提供一个模拟登录功能
+                    simulateGitHubLogin();
+                });
+            }
+        }
+        
+        // 模拟GitHub登录（用于演示）
+        function simulateGitHubLogin() {
+            // 显示加载状态
+            const githubLoginBtn = document.getElementById('githubLoginBtn');
+            if (githubLoginBtn) {
+                githubLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+                githubLoginBtn.disabled = true;
+            }
+            
+            // 创建模拟用户数据
+            const mockUser = {
+                login: 'demo-user',
+                id: 123456,
+                avatar_url: 'https://avatars.githubusercontent.com/u/123456?v=4',
+                name: 'Demo User',
+                email: 'demo@example.com',
+                html_url: 'https://github.com/demo-user'
+            };
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                // 存储用户信息到localStorage
+                localStorage.setItem('githubUser', JSON.stringify(mockUser));
+                
+                // 跳转到论坛页面
+                window.location.href = 'bbs.html';
+            }, 1500);
+        }
+        
+        // 实际的GitHub OAuth登录函数
+        function startGitHubOAuth() {
+            // GitHub OAuth配置 - 使用您提供的Client ID
+            const clientId = 'Ov23liv4elLYx7XVnIQ3';
+            // 注意：需要将您的GitHub OAuth应用的回调URL设置为当前页面的URL
+            const redirectUri = encodeURIComponent(window.location.origin + '/login.html');
+            const scope = encodeURIComponent('read:user user:email');
+            
+            // 构建GitHub OAuth URL
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+            
+            // 重定向到GitHub授权页面
+            window.location.href = authUrl;
+        }
+        
+        // 处理GitHub OAuth回调
+        function handleGitHubCallback() {
+            // 从URL中获取code参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code) {
+                // 显示加载状态
+                const githubLoginBtn = document.getElementById('githubLoginBtn');
+                if (githubLoginBtn) {
+                    githubLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+                    githubLoginBtn.disabled = true;
+                }
+                
+                // 使用code向服务器请求access token
+                // 注意：这里需要一个后端API来处理OAuth流程，因为不能在前端暴露Client Secret
+                fetch('http://localhost:3000/github-auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify({ 
+                        code, 
+                        redirect_uri: window.location.origin + '/login.html' 
+                     })
+                    })
+
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('认证失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.access_token) {
+                        // 使用access token获取用户信息
+                        return fetch('https://api.github.com/user', {
+                            headers: {
+                                'Authorization': `token ${data.access_token}`
+                            }
+                        });
+                    } else {
+                        throw new Error('获取访问令牌失败');
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('获取用户信息失败');
+                    }
+                    return response.json();
+                })
+                .then(userData => {
+                    // 存储用户信息
+                    localStorage.setItem('githubUser', JSON.stringify(userData));
+                    
+                    // 跳转到论坛页面
+                    window.location.href = 'bbs.html';
+                })
+                .catch(error => {
+                    console.error('GitHub OAuth error:', error);
+                    alert('登录失败，请重试');
+                    
+                    // 恢复登录按钮状态
+                    const githubLoginBtn = document.getElementById('githubLoginBtn');
+                    if (githubLoginBtn) {
+                        githubLoginBtn.innerHTML = '<i class="fab fa-github"></i> 使用GitHub登录';
+                        githubLoginBtn.disabled = false;
+                    }
+                });
+            }
+        }
+        
+        // 页面加载时检查是否有OAuth回调代码
+        if (window.location.search.includes('code=')) {
+            // 如果检测到code参数，说明是从GitHub回调回来的
+            handleGitHubCallback();
+        }
+    </script>
+</body>
+</html>
