@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>捐献支持 - SYSTEM-HTY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(52, 152, 219, 0.8);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+            --gold-color: #ffd700;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #f0f0f0; /* 增强对比度 */
+            --text-light: #b0b0b0; /* 增强对比度 */
+            --light-color: #121212;
+            --card-bg: #1a1a1a; /* 加深背景增强对比 */
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(25, 25, 25, 0.95); /* 加深导航栏背景 */
+            --border-color: #555; /* 加深边框增强对比 */
+            --scoin-color: #ba68c8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader.hidden {
+            animation: fadeOut 0.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: white !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 80px auto 40px;
+            padding: 30px;
+        }
+
+        .donate-section {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--dark-color);
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .donate-intro {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .donate-intro p {
+            margin-bottom: 15px;
+            color: var(--text-color); /* 确保使用正确的变量 */
+        }
+
+        .amount-selection {
+            margin-bottom: 30px;
+        }
+
+        .amount-options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .amount-option {
+            padding: 15px 25px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+            color: var(--text-color); /* 确保使用正确的变量 */
+        }
+
+        .amount-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .amount-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-amount {
+            margin: 30px 0;
+        }
+
+        .custom-amount label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--text-color); /* 确保使用正确的变量 */
+        }
+
+        .amount-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .currency-symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color); /* 确保使用正确的变量 */
+        }
+
+        input[type="number"] {
+            width: 150px;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-color); /* 确保使用正确的变量 */
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .donate-button {
+            margin-top: 30px;
+        }
+
+        .btn-donate {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #2980b9 0%, #27ae60 100%);
+        }
+
+        .payment-methods {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .payment-title {
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .payment-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .payment-icon {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .payment-icon:hover {
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .fa-cc-visa { color: #1a1f71; }
+        .fa-cc-mastercard { color: #eb001b; }
+        .fa-cc-paypal { color: #003087; }
+        .fa-cc-apple-pay { color: #000; }
+        .fa-cc-amazon-pay { color: #ff9900; }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .container {
+                margin: 100px 10px 40px;
+                padding: 20px;
+            }
+            
+            .donate-section {
+                padding: 30px 20px;
+            }
+            
+            .amount-options {
+                gap: 10px;
+            }
+            
+            .amount-option {
+                padding: 12px 20px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>加载中...</p>
+    </div>
+    
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+            <a href="donate.html" class="nav-link active">
+                <i class="fas fa-donate"></i> 捐献支持
+            </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="donate-section">
+            <h1>捐献支持</h1>
+            
+            <div class="donate-intro">
+                <p>感谢您考虑支持我的工作！您的捐献将帮助我继续开发免费、开源的软件工具。</p>
+                <p>每一份捐献都是对我工作的认可和鼓励，让我能够投入更多时间和精力来改进现有项目和开发新工具。</p>
+                <p>请选择捐献金额或输入自定义金额，然后点击"立即捐献"按钮。</p>
+            </div>
+            
+            <div class="amount-selection">
+                <h2>选择捐献金额</h2>
+                <div class="amount-options">
+                    <div class="amount-option" data-amount="1">¥1</div>
+                    <div class="amount-option" data-amount="3">¥3</div>
+                    <div class="amount-option" data-amount="5">¥5</div>
+                    <div class="amount-option" data-amount="10">¥10</div>
+                </div>
+                
+                <div class="custom-amount">
+                    <label for="customAmount">或输入自定义金额:</label>
+                    <div class="amount-input">
+                        <span class="currency-symbol">¥</span>
+                        <input type="number" id="customAmount" min="0.01" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="donate-button">
+                <button class="btn-donate" id="donateBtn">
+                    <i class="fas fa-heart"></i> 立即捐献
+                </button>
+            </div>
+            
+            <div class="payment-methods">
+                <h3 class="payment-title">支持的支付方式</h3>
+                <div class="payment-icons">
+                    <i class="fab fa-cc-visa payment-icon"></i>
+                    <i class="fab fa-cc-mastercard payment-icon"></i>
+                    <i class="fab fa-cc-paypal payment-icon"></i>
+                    <i class="fab fa-cc-apple-pay payment-icon"></i>
+                    <i class="fab fa-cc-amazon-pay payment-icon"></i>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
+            <p>您的捐献将直接用于支持开发和维护免费工具</p>
+        </footer>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                try {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                    
+                    // 初始化主题切换
+                    initThemeToggle();
+                    
+                    // 初始化捐献功能
+                    initDonate();
+                } catch (error) {
+                    console.error('初始化出错:', error);
+                }
+            }, 500);
+        });
+
+        // 初始化捐献功能
+        function initDonate() {
+            const amountOptions = document.querySelectorAll('.amount-option');
+            const customAmountInput = document.getElementById('customAmount');
+            const donateBtn = document.getElementById('donateBtn');
+            
+            // 默认选择第一个金额选项
+            amountOptions[0].classList.add('selected');
+            let selectedAmount = 1;
+            
+            // 金额选项点击事件
+            amountOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有选中状态
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // 添加当前选中状态
+                    this.classList.add('selected');
+                    
+                    // 更新选中金额
+                    selectedAmount = parseFloat(this.dataset.amount);
+                    
+                    // 清空自定义金额输入
+                    customAmountInput.value = '';
+                });
+            });
+            
+            // 自定义金额输入事件
+            customAmountInput.addEventListener('input', function() {
+                const value = parseFloat(this.value);
+                
+                if (!isNaN(value) && value > 0) {
+                    // 移除所有预设金额的选中状态
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // 更新选中金额
+                    selectedAmount = value;
+                }
+            });
+            
+            // 捐献按钮点击事件
+            donateBtn.addEventListener('click', function() {
+                // 检查是否有有效金额
+                if (selectedAmount <= 0) {
+                    alert('请选择或输入有效的捐献金额');
+                    return;
+                }
+                
+                // 显示加载状态
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+                this.disabled = true;
+                
+                // 模拟处理过程
+                setTimeout(function() {
+                    // 跳转到感谢页面
+                    window.location.href = 'Thanks.html';
+                }, 1500);
+            });
+        }
+        
+        // 初始化主题切换
+        function initThemeToggle() {
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // 检查本地存储的主题设置
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        this.innerHTML = '<i class="fas fa-moon"></i>';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        this.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

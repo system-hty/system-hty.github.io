@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>SYSTEM-HTY的个人网站</title>
+  <link>https://system-hty.netlify.app/</link>
+  <description>Python开发者个人网站，分享开发项目和编程经验</description>
+  <atom:link href="https://system-hty.netlify.app/rss.xml" rel="self" type="application/rss+xml" />
+  <language>zh</language>
+  <pubDate>Sat, 09 Sep 2023 00:00:00 GMT</pubDate>
+  <lastBuildDate>Sat, 09 Sep 2023 00:00:00 GMT</lastBuildDate>
+  
+  <item>
+    <title>极域电子教室破解工具 v3.1.7 发布</title>
+    <link>https://system-hty.netlify.app/download.html</link>
+    <description>新增高级破解功能，提升稳定性，修复已知问题</description>
+    <pubDate>Sat, 31 Aug 2025 00:00:00 GMT</pubDate>
+    <guid>https://system-hty.netlify.app/download.html#v3.1.7</guid>
+  </item>
+  
+  <item>
+    <title>数据备份助手更新</title>
+    <link>https://system-hty.netlify.app/download.html</link>
+    <description>新增自动备份计划功能，支持更多云存储服务</description>
+    <pubDate>Tue, 15 Jul 2025 00:00:00 GMT</pubDate>
+    <guid>https://system-hty.netlify.app/download.html#backup-tool</guid>
+  </item>
+  
+  <item>
+    <title>网站全新改版上线</title>
+    <link>https://system-hty.netlify.app/</link>
+    <description>SYSTEM-HTY个人网站全新改版，增加更多功能和内容</description>
+    <pubDate>Tue, 10 Jun 2025 00:00:00 GMT</pubDate>
+    <guid>https://system-hty.netlify.app/#website-redesign</guid>
+  </item>
+</channel>
+</rss>

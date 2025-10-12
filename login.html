@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - SYSTEM-HTY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+            --scoin-color: #ba68c8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .login-logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            font-size: 1rem;
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-light);
+        }
+
+        .login-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--scoin-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification-icon {
+            color: var(--scoin-color);
+            font-size: 1.5rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 10px;
+            }
+            
+            .login-card {
+                padding: 20px;
+            }
+            
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        <i class="fas fa-coins notification-icon"></i>
+        <span id="notificationText"></span>
+    </div>
+
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzQ5OGRiIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U1lTVEVNLUhUWTwvdGV4dD48L3N2Zz4='">
+                </div>
+                <h1 class="login-title">登录 SYSTEM-HTY</h1>
+                <p class="login-subtitle">使用您的账户登录系统</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="email">邮箱</label>
+                    <input type="email" id="email" class="form-input" placeholder="请输入邮箱地址" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="registerBtn">
+                        <i class="fas fa-user-plus"></i> 注册
+                    </button>
+                </div>
+            </form>
+            
+            <div class="login-footer">
+                <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化Supabase客户端
+        // 请替换为您的Supabase项目URL和匿名密钥
+        const supabaseUrl = 'https://uwzdneeawtgjlnyxjtcm.supabase.co'; // 替换为您的Supabase URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3emRuZWVhd3RnamxueXhqdGNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTc0MTcsImV4cCI6MjA3NTc3MzQxN30._yK9wpqT6Y8a_rzYeDloKvSbjaoIn_AFatgSlT-HqvI'; // 替换为您的Supabase匿名密钥
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // 显示通知
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.style.borderLeftColor = 'var(--accent-color)';
+            } else {
+                notification.style.borderLeftColor = 'var(--scoin-color)';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 初始化主题切换
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            
+            // 检查本地存储的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                if (currentTheme === 'dark') {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    this.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    this.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+        }
+
+        // 登录功能
+        async function handleLogin(email, password) {
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.innerHTML;
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登录中...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+                
+                if (error) {
+                    showNotification('登录失败: ' + error.message, true);
+                } else {
+                    showNotification('登录成功！正在跳转...');
+                    // 登录成功，跳转到主页
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                }
+            } catch (error) {
+                showNotification('登录失败，请重试', true);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalText;
+            }
+        }
+
+        // 注册功能
+        async function handleRegister(email, password) {
+            const registerBtn = document.getElementById('registerBtn');
+            const originalText = registerBtn.innerHTML;
+            
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 注册中...';
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+                
+                if (error) {
+                    showNotification('注册失败: ' + error.message, true);
+                } else {
+                    showNotification('注册成功！');
+                }
+            } catch (error) {
+                showNotification('注册失败，请重试', true);
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = originalText;
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeToggle();
+            
+            // 登录表单提交
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    showNotification('请填写邮箱和密码', true);
+                    return;
+                }
+                
+                handleLogin(email, password);
+            });
+            
+            // 注册按钮点击
+            document.getElementById('registerBtn').addEventListener('click', function() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    showNotification('请填写邮箱和密码', true);
+                    return;
+                }
+                
+                handleRegister(email, password);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "scoin-system",
+  "version": "1.0.0",
+  "dependencies": {
+    "faunadb": "^4.5.2"
+  }
+}

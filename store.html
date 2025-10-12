@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>S币商店 - SYSTEM-HTY</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+            --gold-color: #ffd700;
+            --silver-color: #c0c0c0;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+            --scoin-color: #ba68c8;
+            --gold-color: #ffcc00;
+            --silver-color: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 粒子背景 */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+        
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            transition: var(--transition);
+        }
+        
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+        
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: var(--dark-color) !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+        
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+        
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-name {
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+        
+        .scoin-mini {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--scoin-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .scoin-mini i {
+            margin-right: 5px;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .logout-btn:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+        
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gold-color), var(--silver-color), var(--gold-color));
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: textGlow 2s infinite alternate;
+        }
+        
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .scoin-balance {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 20px 0;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .scoin-count {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--scoin-color);
+        }
+        
+        .section {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1, h2, h3 {
+            color: var(--dark-color);
+            margin-top: 0;
+        }
+        
+        h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        p, li {
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+        
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .package-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+            animation: cardAppear 0.8s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .package-card:nth-child(1) { animation-delay: 0.1s; }
+        .package-card:nth-child(2) { animation-delay: 0.2s; }
+        .package-card:nth-child(3) { animation-delay: 0.3s; }
+        .package-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .package-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .package-header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--scoin-color) 0%, #7b1fa2 100%);
+            color: white;
+        }
+        
+        .package-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .package-price {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .package-price .scoin-icon {
+            color: var(--gold-color);
+            margin-right: 5px;
+        }
+        
+        .package-content {
+            padding: 20px;
+        }
+        
+        .package-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .package-features li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .package-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .package-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .buy-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--scoin-color) 0%, #7b1fa2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .buy-btn:hover {
+            background: linear-gradient(135deg, #7b1fa2 0%, var(--scoin-color) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(123, 31, 162, 0.4);
+        }
+        
+        .popular-tag {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: var(--gold-color);
+            color: #333;
+            padding: 5px 30px;
+            font-weight: bold;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .payment-method {
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .payment-method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .payment-icon {
+            font-size: 1.5rem;
+        }
+        
+        .alipay-icon {
+            color: #00a1e9;
+        }
+        
+        .wechat-icon {
+            color: #07c160;
+        }
+        
+        .paypal-icon {
+            color: #003087;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--scoin-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        .notification-icon {
+            color: var(--scoin-color);
+            font-size: 1.5rem;
+        }
+        
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        /* 动画效果 */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .brand {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .brand-logo {
+                height: 35px;
+            }
+            
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            
+            .container {
+                margin: 120px 10px 80px;
+                padding: 15px;
+            }
+            
+            .package-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div id="particles-js"></div>
+    
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>加载中...</p>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-coins notification-icon"></i>
+        <span id="notificationText"></span>
+    </div>
+    
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="store.html" class="nav-link active">
+                <i class="fas fa-store"></i> S币商店
+            </a>
+            <a href="about.html" class="nav-link">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+        </div>
+        
+        <div id="authButtons">
+            <a href="#" class="nav-link" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </a>
+            <a href="#" class="nav-link" id="registerBtn">
+                <i class="fas fa-user-plus"></i> 注册
+            </a>
+        </div>
+        
+        <div id="userStatus" class="user-status" style="display: none;">
+            <div class="user-avatar" id="userAvatar"></div>
+            <span class="user-name" id="userName"></span>
+            <span class="scoin-mini">
+                <i class="fas fa-coins"></i> <span id="scoinCount">0</span>
+            </span>
+            <a href="PersonalHomepage.html" class="nav-link" title="个人主页">
+                <i class="fas fa-home"></i>
+            </a>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">S币商店</h1>
+            <p class="hero-subtitle">购买S币解锁更多高级功能和专属内容</p>
+            
+            <div class="scoin-balance">
+                您的S币余额: <span class="scoin-count" id="scoinBalance">0</span>
+                <span id="adminBadge" class="admin-badge" style="display: none;">
+                    <i class="fas fa-crown"></i> 站长
+                </span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>S币套餐</h2>
+            <p>选择适合您的S币套餐，解锁更多功能和特权</p>
+            
+            <div class="package-grid">
+                <div class="package-card">
+                    <div class="package-header">
+                        <h3 class="package-title">入门包</h3>
+                        <div class="package-price">
+                            <i class="fas fa-coins scoin-icon"></i> 50 S币
+                        </div>
+                        <p>¥ 5.00</p>
+                    </div>
+                    <div class="package-content">
+                        <ul class="package-features">
+                            <li>解锁基础工具功能</li>
+                            <li>1个月更新支持</li>
+                            <li>优先问题解答</li>
+                            <li>社区基础权限</li>
+                        </ul>
+                        <button class="buy-btn">立即购买</button>
+                    </div>
+                </div>
+                
+                <div class="package-card">
+                    <div class="popular-tag">最受欢迎</div>
+                    <div class="package-header">
+                        <h3 class="package-title">进阶包</h3>
+                        <div class="package-price">
+                            <i class="fas fa-coins scoin-icon"></i> 150 S币
+                        </div>
+                        <p>¥ 12.00</p>
+                    </div>
+                    <div class="package-content">
+                        <ul class="package-features">
+                            <li>解锁所有工具高级功能</li>
+                            <li>3个月更新支持</li>
+                            <li>24小时优先技术支持</li>
+                            <li>社区高级权限</li>
+                            <li>专属内容访问</li>
+                        </ul>
+                        <button class="buy-btn">立即购买</button>
+                    </div>
+                </div>
+                
+                <div class="package-card">
+                    <div class="package-header">
+                        <h3 class="package-title">专业包</h3>
+                        <div class="package-price">
+                            <i class="fas fa-coins scoin-icon"></i> 300 S币
+                        </div>
+                        <p>¥ 20.00</p>
+                    </div>
+                    <div class="package-content">
+                        <ul class="package-features">
+                            <li>解锁所有工具高级功能</li>
+                            <li>6个月更新支持</li>
+                            <li>专属技术支持经理</li>
+                            <li>社区管理员权限</li>
+                            <li>所有专属内容访问</li>
+                            <li>新功能优先体验</li>
+                        </ul>
+                        <button class="buy-btn">立即购买</button>
+                    </div>
+                </div>
+                
+                <div class="package-card">
+                    <div class="package-header">
+                        <h3 class="package-title">至尊包</h3>
+                        <div class="package-price">
+                            <i class="fas fa-coins scoin-icon"></i> 800 S币
+                        </div>
+                        <p>¥ 50.00</p>
+                    </div>
+                    <div class="package-content">
+                        <ul class="package-features">
+                            <li>解锁所有工具高级功能</li>
+                            <li>终身更新支持</li>
+                            <li>专属技术支持经理</li>
+                            <li>社区管理员权限</li>
+                            <li>所有专属内容访问</li>
+                            <li>新功能优先体验</li>
+                            <li>定制功能开发</li>
+                            <li>专属VIP标识</li>
+                        </ul>
+                        <button class="buy-btn">立即购买</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>支付方式</h2>
+            <p>选择您喜欢的支付方式购买S币</p>
+            
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <i class="fab fa-alipay payment-icon alipay-icon"></i>
+                    <span>支付宝</span>
+                </div>
+                
+                <div class="payment-method">
+                    <i class="fab fa-weixin payment-icon wechat-icon"></i>
+                    <span>微信支付</span>
+                </div>
+                
+                <div class="payment-method">
+                    <i class="fab fa-paypal payment-icon paypal-icon"></i>
+                    <span>PayPal</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>S币使用指南</h2>
+            <p>S币是SYSTEM-HTY平台的虚拟货币，可用于解锁各种功能和内容</p>
+            
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-unlock"></i>
+                    </div>
+                    <div class="feature-title">解锁高级功能</div>
+                    <div class="feature-desc">使用S币解锁工具的高级功能</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="feature-title">下载专属内容</div>
+                    <div class="feature-desc">下载仅对S币用户开放的内容</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="feature-title">定制功能开发</div>
+                    <div class="feature-desc">申请定制功能开发服务</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="feature-title">优先技术支持</div>
+                    <div class="feature-desc">享受优先技术支持服务</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023-2025 SYSTEM-HTY. 保留所有权利.</p>
+            <p>本网站使用HTML5、CSS3和JavaScript构建</p>
+            <p>加载时间: <span id="loadTime"></span> 毫秒</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                try {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                    
+                    // 记录加载时间
+                    var loadTime = performance.now();
+                    document.getElementById('loadTime').textContent = Math.round(loadTime);
+                    
+                    // 初始化粒子背景
+                    initParticles();
+                    
+                    // 初始化Netlify Identity
+                    initNetlifyIdentity();
+                    
+                    // 初始化主题切换
+                    initThemeToggle();
+                    
+                    // 初始化滚动动画
+                    initScrollAnimation();
+                    
+                    // 初始化购买按钮
+                    initBuyButtons();
+                    
+                } catch (error) {
+                    console.error('初始化出错:', error);
+                }
+            }, 500);
+        });
+        
+        // 粒子背景初始化
+        function initParticles() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: {
+                        value: 80,
+                        density: {
+                            enable: true,
+                            value_area: 800
+                        }
+                    },
+                    color: {
+                        value: function() {
+                            return document.documentElement.getAttribute('data-theme') === 'dark' 
+                                ? '#64b5f6' 
+                                : '#3498db';
+                        }
+                    },
+                    shape: {
+                        type: "circle",
+                        stroke: {
+                            width: 0,
+                            color: "#000000"
+                        },
+                        polygon: {
+                            nb_sides: 5
+                        }
+                    },
+                    opacity: {
+                        value: 0.5,
+                        random: false,
+                        anim: {
+                            enable: false,
+                            speed: 1,
+                            opacity_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    size: {
+                        value: 3,
+                        random: true,
+                        anim: {
+                            enable: false,
+                            speed: 40,
+                            size_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: function() {
+                            return document.documentElement.getAttribute('data-theme') === 'dark' 
+                                ? '#81c784' 
+                                : '#2ecc71';
+                        },
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: "none",
+                        random: false,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false,
+                        attract: {
+                            enable: false,
+                            rotateX: 600,
+                            rotateY: 1200
+                        }
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: {
+                            enable: true,
+                            mode: "grab"
+                        },
+                        onclick: {
+                            enable: true,
+                            mode: "push"
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 140,
+                            line_linked: {
+                                opacity: 1
+                            }
+                        },
+                        push: {
+                            particles_nb: 4
+                        }
+                    }
+                },
+                retina_detect: true
+            });
+        }
+        
+        // Netlify Identity初始化
+        function initNetlifyIdentity() {
+            if (window.netlifyIdentity) {
+                netlifyIdentity.on('init', user => {
+                    updateUI(user);
+                    if (user) {
+                        getScoinData(user);
+                    }
+                });
+                
+                netlifyIdentity.on('login', user => {
+                    updateUI(user);
+                    getScoinData(user);
+                    netlifyIdentity.close();
+                });
+                
+                netlifyIdentity.on('logout', () => {
+                    updateUI(null);
+                });
+                
+                netlifyIdentity.on('error', err => {
+                    console.error('Netlify Identity错误:', err);
+                    showNotification('身份验证错误: ' + err.message);
+                });
+                
+                // 绑定登录按钮
+                document.getElementById('loginBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.open('login');
+                });
+                
+                // 绑定注册按钮
+                document.getElementById('registerBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.open('signup');
+                });
+                
+                // 绑定退出按钮
+                document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    netlifyIdentity.logout();
+                });
+                
+                netlifyIdentity.init();
+            }
+        }
+        
+        // 更新用户界面
+        function updateUI(user) {
+            const authButtons = document.getElementById('authButtons');
+            const userStatus = document.getElementById('userStatus');
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const scoinCount = document.getElementById('scoinCount');
+            const adminBadge = document.getElementById('adminBadge');
+            
+            if (user) {
+                // 用户已登录
+                authButtons.style.display = 'none';
+                userStatus.style.display = 'flex';
+                
+                // 设置用户信息
+                const name = user.user_metadata.full_name || user.email;
+                userName.textContent = name;
+                
+                // 设置用户头像
+                const initial = name.charAt(0).toUpperCase();
+                userAvatar.textContent = initial;
+                
+                // 检查是否是站长
+                if (user.email === '644043561@qq.com') {
+                    adminBadge.style.display = 'inline-block';
+                }
+            } else {
+                // 用户未登录
+                authButtons.style.display = 'flex';
+                userStatus.style.display = 'none';
+                scoinCount.textContent = '0';
+                document.getElementById('scoinBalance').textContent = '0';
+                adminBadge.style.display = 'none';
+            }
+        }
+        
+        // 获取S币数据
+        async function getScoinData(user) {
+            try {
+                const response = await fetch('/.netlify/functions/get-scoin', {
+                    headers: {
+                        'Authorization': 'Bearer ' + user.token.access_token
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('获取S币数据失败');
+                }
+                
+                const data = await response.json();
+                
+                // 更新显示
+                document.getElementById('scoinBalance').textContent = data.balance;
+                document.getElementById('scoinCount').textContent = data.balance;
+            } catch (error) {
+                console.error('获取S币数据时出错:', error);
+                showNotification('获取S币数据失败: ' + error.message);
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化主题切换
+        function initThemeToggle() {
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // 检查本地存储的主题设置
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        this.innerHTML = '<i class="fas fa-moon"></i>';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        this.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                    
+                    // 重新初始化粒子效果以适应新主题
+                    initParticles();
+                });
+            }
+        }
+        
+        // 初始化滚动动画
+        function initScrollAnimation() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            // 观察所有需要动画的元素
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        }
+        
+        // 初始化购买按钮
+        function initBuyButtons() {
+            const buyButtons = document.querySelectorAll('.buy-btn');
+            buyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const packageCard = this.closest('.package-card');
+                    const packageTitle = packageCard.querySelector('.package-title').textContent;
+                    
+                    showNotification(`已选择 ${packageTitle} 套餐`);
+                    
+                    // 添加购买动画效果
+                    this.textContent = '处理中...';
+                    this.disabled = true;
+                    
+                    setTimeout(() => {
+                        this.textContent = '购买成功！';
+                        this.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+                        
+                        // 添加成功动画
+                        const successIcon = document.createElement('i');
+                        successIcon.className = 'fas fa-check';
+                        this.prepend(successIcon);
+                        
+                        // 添加庆祝动画
+                        const packageHeader = packageCard.querySelector('.package-header');
+                        const confetti = document.createElement('div');
+                        confetti.style.position = 'absolute';
+                        confetti.style.top = '0';
+                        confetti.style.left = '0';
+                        confetti.style.width = '100%';
+                        confetti.style.height = '100%';
+                        confetti.style.background = 'radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%)';
+                        confetti.style.zIndex = '10';
+                        confetti.style.animation = 'fadeOut 1.5s forwards';
+                        packageHeader.appendChild(confetti);
+                        
+                        // 更新S币余额
+                        const scoinBalance = document.getElementById('scoinBalance');
+                        const currentBalance = parseInt(scoinBalance.textContent);
+                        const packageScoin = parseInt(packageCard.querySelector('.package-price').textContent.match(/\d+/)[0]);
+                        scoinBalance.textContent = currentBalance + packageScoin;
+                        
+                        // 添加余额更新动画
+                        scoinBalance.parentElement.style.animation = 'pulse 1s';
+                        setTimeout(() => {
+                            scoinBalance.parentElement.style.animation = '';
+                        }, 1000);
+                        
+                    }, 1500);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

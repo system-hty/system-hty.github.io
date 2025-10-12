@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S币系统 - SYSTEM-HTY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+            --scoin-color: #9c27b0;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+            --scoin-color: #ba68c8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader.hidden {
+            animation: fadeOut 0.5s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+           100% { opacity: 0; visibility: hidden; }
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            transition: var(--transition);
+        }
+
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: var(--dark-color) !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .scoin-mini {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--scoin-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .scoin-mini i {
+            margin-right: 5px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--dark-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            text-decoration: underline;
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ffd700, #c0c0c0, #ffd700);
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+        }
+
+        .hero-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .hero-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--dark-color);
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        p, li {
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
+        .feature-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .feature-card {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-left-color: var(--secondary-color);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .feature-desc {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .scoin-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--scoin-color);
+            box-shadow: var(--shadow);
+        }
+
+        .scoin-balance {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .scoin-count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--scoin-color);
+        }
+
+        .scoin-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-scoin {
+            background-color: var(--scoin-color);
+            color: white;
+        }
+
+        .btn-scoin:hover {
+            background-color: #7b1fa2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-scoin:disabled {
+            background-color: #b39ddb;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .scoin-info {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background-color: #ffd700;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .admin-features {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid #ffd700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card-admin {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card-admin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon-admin {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .feature-title-admin {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .feature-desc-admin {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .detail-value {
+            color: var(--text-color);
+        }
+
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--scoin-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 90%;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .notification-icon {
+            color: var(--scoin-color);
+            font-size: 1.5rem;
+        }
+
+        .github-login-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .github-login-btn:hover {
+            background-color: #24292e;
+            transform: translateY(-2px);
+        }
+
+        /* ===== 移动设备适配 ===== */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .brand {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .brand-logo {
+                height: 35px;
+            }
+            
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            
+            .feature-cards {
+                flex-direction: column;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                margin: 120px 10px 40px;
+                padding: 15px;
+            }
+            
+            .scoin-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <p>加载中...</p>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-coins notification-icon"></i>
+        <span id="notificationText"></span>
+    </div>
+    
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="index.html#projects" class="nav-link">
+                <i class="fas fa-project-diagram"></i> 项目
+            </a>
+            <a href="about.html" class="nav-link">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link active">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+        </div>
+        
+        <div id="authButtons">
+            <a href="#" class="nav-link" id="loginBtn">
+                <i class="fab fa-github"></i> GitHub登录
+            </a>
+        </div>
+        
+        <div id="userStatus" class="user-status" style="display: none;">
+            <div class="user-avatar" id="userAvatar">
+                <img id="userAvatarImg" src="" alt="用户头像">
+            </div>
+            <span class="user-name" id="userName"></span>
+            <span class="scoin-mini">
+                <i class="fas fa-coins"></i> <span id="scoinCount">0</span>
+            </span>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-section">
+            <div class="hero-avatar">
+                <img src="images/avatar.jpg" alt="SYSTEM-HTY头像" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'">
+            </div>
+            <h1 class="hero-title">S币系统</h1>
+            <p class="hero-subtitle">积分奖励系统 | 站长每日领取100S币 | 普通用户每日领取1S币</p>
+        </div>
+        
+        <div id="loginSection" class="section" style="text-align: center;">
+            <h2>登录以访问S币系统</h2>
+            <p>使用GitHub账号登录，开始赚取和使用S币</p>
+            <a href="#" class="github-login-btn" id="githubLoginBtn">
+                <i class="fab fa-github"></i> 使用GitHub登录
+            </a>
+        </div>
+        
+        <div id="userSection" class="section" style="display: none;">
+            <h2>我的账户</h2>
+            <div class="user-details">
+                <div class="detail-item">
+                    <span class="detail-label">用户名:</span>
+                    <span class="detail-value" id="displayName">SYSTEM-HTY</span>
+                    <span id="adminBadge" class="admin-badge" style="display: none;">
+                        <i class="fas fa-crown"></i> 站长
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">邮箱:</span>
+                    <span class="detail-value" id="userEmail">未设置</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">GitHub用户名:</span>
+                    <span class="detail-value" id="githubUsername">未设置</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">用户类型:</span>
+                    <span class="detail-value" id="userType">普通用户</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">加入时间:</span>
+                    <span class="detail-value" id="joinDate">2023-01-15</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="scoinSection" class="scoin-section" style="display: none;">
+            <h2>S币余额</h2>
+            <div class="scoin-balance">
+                您的S币余额: <span class="scoin-count" id="scoinBalance">0</span>
+            </div>
+            
+            <div class="scoin-actions">
+                <button class="btn btn-scoin" id="claimScoinBtn">
+                    <i class="fas fa-gift"></i> 领取今日S币
+                </button>
+            </div>
+            
+            <div class="scoin-info" id="scoinInfo">
+                每天登录可领取S币
+            </div>
+        </div>
+
+        <div id="statsSection" class="stats-grid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="stat-number">27</div>
+                <div class="stat-label">项目数量</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">1,258</div>
+                <div class="stat-label">用户数量</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <div class="stat-number">8,742</div>
+                <div class="stat-label">下载次数</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">获得的奖项</div>
+            </div>
+        </div>
+
+        <div id="adminFeatures" class="admin-features" style="display: none;">
+            <h2><i class="fas fa-crown"></i> 站长专属功能</h2>
+            <div class="features-grid">
+                <div class="feature-card-admin">
+                    <div class="feature-icon-admin">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <div class="feature-title-admin">用户管理</div>
+                    <div class="feature-desc-admin">管理所有注册用户，设置权限和角色</div>
+                </div>
+                
+                <div class="feature-card-admin">
+                    <div class="feature-icon-admin">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="feature-title-admin">系统设置</div>
+                    <div class="feature-desc-admin">配置网站参数，管理服务器资源</div>
+                </div>
+                
+                <div class="feature-card-admin">
+                    <div class="feature-icon-admin">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-title-admin">数据分析</div>
+                    <div class="feature-desc-admin">查看网站访问数据和使用统计</div>
+                </div>
+                
+                <div class="feature-card-admin">
+                    <div class="feature-icon-admin">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title-admin">安全中心</div>
+                    <div class="feature-desc-admin">监控安全事件，管理访问权限</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>S币使用指南</h2>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-unlock"></i>
+                    </div>
+                    <div class="feature-title">解锁高级功能</div>
+                    <div class="feature-desc">使用S币解锁工具的高级功能</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="feature-title">下载付费资源</div>
+                    <div class="feature-desc">下载需要付费的工具和资源</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="feature-title">兑换奖励</div>
+                    <div class="feature-desc">兑换专属奖励和礼品</div>
+                </div>
+            </div>
+            <p>更多功能开发中，敬请期待！</p>
+        </div>
+        
+        <footer>
+            <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
+            <p>S币系统 - 最后更新: 2023-10-15</p>
+        </footer>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                try {
+                    var loader = document.getElementById('loader');
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                    
+                    // 初始化主题切换
+                    initThemeToggle();
+                    
+                    // 检查本地存储中是否有用户信息
+                    checkUserStatus();
+                    
+                } catch (error) {
+                    console.error('初始化出错:', error);
+                }
+            }, 500);
+        });
+
+        // 初始化主题切换
+        function initThemeToggle() {
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // 检查本地存储的主题设置
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        this.innerHTML = '<i class="fas fa-moon"></i>';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        this.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                });
+            }
+        }
+        
+        // 检查用户状态
+        function checkUserStatus() {
+            const userData = localStorage.getItem('github_user');
+            if (userData) {
+                const user = JSON.parse(userData);
+                updateUI(user);
+            } else {
+                // 显示登录界面
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('authButtons').style.display = 'flex';
+                document.getElementById('userStatus').style.display = 'none';
+            }
+            
+            // 绑定GitHub登录按钮
+            document.getElementById('githubLoginBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                simulateGitHubLogin();
+            });
+            
+            // 绑定退出按钮
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('github_user');
+                localStorage.removeItem('scoin_data');
+                window.location.reload();
+            });
+            
+            // 绑定领取S币按钮
+            document.getElementById('claimScoinBtn').addEventListener('click', function() {
+                claimScoin();
+            });
+        }
+        
+        // 模拟GitHub登录
+        function simulateGitHubLogin() {
+            // 在实际应用中，这里应该重定向到GitHub OAuth页面
+            // 例如: window.location.href = `https://github.com/login/oauth/authorize?client_id=YOUR_CLIENT_ID&scope=user:email`;
+            
+            // 模拟用户数据
+            const userData = {
+                login: 'SYSTEM-HTY',
+                avatar_url: 'images/avatar.jpg',
+                email: '644043561@qq.com',
+                name: 'SYSTEM-HTY'
+            };
+            
+            // 存储用户数据
+            localStorage.setItem('github_user', JSON.stringify(userData));
+            
+            // 初始化S币数据（如果不存在）
+            if (!localStorage.getItem('scoin_data')) {
+                const scoinData = {
+                    balance: 114514, // 站长初始S币
+                    lastClaimDate: null
+                };
+                localStorage.setItem('scoin_data', JSON.stringify(scoinData));
+            }
+            
+            // 更新UI
+            updateUI(userData);
+            
+            // 显示通知
+            showNotification('GitHub登录成功！');
+        }
+        
+        // 更新用户界面
+        function updateUI(user) {
+            // 隐藏登录界面，显示用户内容
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'block';
+            document.getElementById('scoinSection').style.display = 'block';
+            document.getElementById('statsSection').style.display = 'grid';
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userStatus').style.display = 'flex';
+            
+            // 设置用户信息
+            document.getElementById('userName').textContent = user.login;
+            document.getElementById('displayName').textContent = user.name || user.login;
+            document.getElementById('userEmail').textContent = user.email || '未设置';
+            document.getElementById('githubUsername').textContent = user.login;
+            
+            // 设置用户头像
+            const userAvatar = document.getElementById('userAvatarImg');
+            if (userAvatar) {
+                userAvatar.src = user.avatar_url;
+                userAvatar.alt = user.login;
+            }
+            
+            // 检查是否是站长
+            const isAdmin = user.login === 'SYSTEM-HTY' || user.email === '644043561@qq.com';
+            if (isAdmin) {
+                document.getElementById('adminBadge').style.display = 'inline-block';
+                document.getElementById('adminFeatures').style.display = 'block';
+                document.getElementById('userType').textContent = '站长';
+            } else {
+                document.getElementById('adminBadge').style.display = 'none';
+                document.getElementById('adminFeatures').style.display = 'none';
+                document.getElementById('userType').textContent = '普通用户';
+            }
+            
+            // 更新S币数据
+            updateScoinDisplay(isAdmin);
+        }
+        
+        // 更新S币显示
+        function updateScoinDisplay(isAdmin) {
+            const scoinData = JSON.parse(localStorage.getItem('scoin_data') || '{"balance":0, "lastClaimDate":null}');
+            
+            // 更新显示
+            document.getElementById('scoinBalance').textContent = scoinData.balance;
+            document.getElementById('scoinCount').textContent = scoinData.balance;
+            
+            // 检查今天是否已经领取
+            const today = new Date().toISOString().split('T')[0];
+            if (scoinData.lastClaimDate === today) {
+                document.getElementById('claimScoinBtn').disabled = true;
+                document.getElementById('claimScoinBtn').innerHTML = '<i class="fas fa-check"></i> 今日已领取';
+                document.getElementById('scoinInfo').textContent = '您今天已经领取过S币了，明天再来吧！';
+            } else {
+                document.getElementById('claimScoinBtn').disabled = false;
+                document.getElementById('claimScoinBtn').innerHTML = '<i class="fas fa-gift"></i> 领取今日S币';
+                
+                // 根据用户类型显示不同的提示信息
+                if (isAdmin) {
+                    document.getElementById('scoinInfo').textContent = '作为站长，您每天可以领取100个S币！';
+                } else {
+                    document.getElementById('scoinInfo').textContent = '每天登录可领取1个S币';
+                }
+            }
+        }
+        
+        // 领取S币
+        function claimScoin() {
+            const userData = JSON.parse(localStorage.getItem('github_user') || '{}');
+            const isAdmin = userData.login === 'SYSTEM-HTY' || userData.email === '644043561@qq.com';
+            
+            const btn = document.getElementById('claimScoinBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 领取中...';
+            
+            setTimeout(function() {
+                const scoinData = JSON.parse(localStorage.getItem('scoin_data') || '{"balance":0, "lastClaimDate":null}');
+                
+                // 根据用户身份确定领取数量
+                const amount = isAdmin ? 100 : 1;
+                
+                // 增加S币
+                scoinData.balance += amount;
+                scoinData.lastClaimDate = new Date().toISOString().split('T')[0];
+                
+                // 保存数据
+                localStorage.setItem('scoin_data', JSON.stringify(scoinData));
+                
+                // 更新显示
+                updateScoinDisplay(isAdmin);
+                
+                // 显示通知
+                showNotification(`成功领取${amount}个S币！`);
+            }, 1000);
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

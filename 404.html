@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面未找到 - 404错误</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            --transition: all 0.3s ease;
+            --nav-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #ddd;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #e0e0e0;
+            --text-light: #a0a0a0;
+            --light-color: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            --primary-color: #64b5f6;
+            --secondary-color: #81c784;
+            --accent-color: #ff8a65;
+            --dark-color: #f5f5f5;
+            --nav-bg: rgba(30, 30, 30, 0.95);
+            --border-color: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            scroll-behavior: smooth;
+            background-color: var(--light-color);
+            line-height: 1.6;
+        }
+        
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .brand-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            transition: var(--transition);
+        }
+
+        .top-nav:hover .brand-logo {
+            transform: scale(1.05);
+        }
+
+        .top-nav:hover .brand-name {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-link {
+            padding: 8px 15px;
+            background-color: var(--nav-bg);
+            color: var(--dark-color) !important;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .error-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        
+        .error-icon {
+            font-size: 8rem;
+            color: var(--accent-color);
+            margin: 30px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: var(--text-color);
+        }
+        
+        .contact-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 35px 0;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .contact-info h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: var(--dark-color);
+        }
+        
+        .contact-email {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            transition: var(--transition);
+        }
+        
+        .contact-email:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(45deg);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .brand {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .brand-logo {
+                height: 35px;
+            }
+            
+            .brand-name {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+            }
+            
+            .hero-title {
+                font-size: 4rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .container {
+                margin: 120px 10px 40px;
+                padding: 15px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .error-content {
+                padding: 20px;
+            }
+            
+            .error-icon {
+                font-size: 5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="brand">
+            <div class="brand-logo">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+            </div>
+            <div class="brand-name">SYSTEM-HTY</div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> 主页
+            </a>
+            <a href="download.html" class="nav-link">
+                <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="about.html" class="nav-link">
+                <i class="fas fa-info-circle"></i> 关于
+            </a>
+            <a href="scoin-system.html" class="nav-link">
+                <i class="fas fa-coins"></i> S币系统
+            </a>
+        </div>
+    </div>
+    
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">404</h1>
+            <p class="hero-subtitle">哎呀！页面未找到</p>
+        </div>
+        
+        <div class="error-content">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            
+            <div class="error-message">
+                <p>您正在尝试访问的页面不存在或已被移除。</p>
+                <p>这可能是因为链接已过期，或者您输入了错误的URL地址。</p>
+            </div>
+            
+            <div class="contact-info">
+                <h3>需要帮助？</h3>
+                <p>如果您认为这是一个错误，或者需要进一步协助，请通过以下方式联系我：</p>
+                <a href="mailto:644043561@qq.com" class="contact-email">
+                    <i class="fas fa-envelope"></i> 644043561@qq.com
+                </a>
+            </div>
+            
+            <div class="btn-container">
+                <a href="index.html" class="btn">
+                    <i class="fas fa-home"></i> 返回首页
+                </a>
+                <a href="download.html" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> 下载页面
+                </a>
+                <a href="about.html" class="btn btn-secondary">
+                    <i class="fas fa-info-circle"></i> 关于我们
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
+            <p>页面未找到 - 404错误页面</p>
+        </footer>
+    </div>
+
+    <script>
+        // 初始化主题切换
+        function initThemeToggle() {
+            var themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                // 检查本地存储的主题设置
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    var currentTheme = document.documentElement.getAttribute('data-theme');
+                    if (currentTheme === 'dark') {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        this.innerHTML = '<i class="fas fa-moon"></i>';
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        this.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                });
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeToggle();
+            
+            // 添加页面加载动画效果
+            const elements = document.querySelectorAll('.hero-title, .hero-subtitle, .error-icon, .error-message, .contact-info, .btn-container');
+            elements.forEach((el, index) => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    el.style.opacity = 1;
+                    el.style.transform = 'translateY(0)';
+                }, 100 + (index * 150));
+            });
+        });
+    </script>
+</body>
+</html>

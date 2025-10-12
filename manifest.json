@@ -1,0 +1,24 @@
+{
+  "name": "SYSTEM-HTY的个人网站",
+  "short_name": "SYSTEM-HTY",
+  "description": "Python开发者个人网站，分享开发项目和编程经验",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["technology", "education"],
+  "lang": "zh"
+}
