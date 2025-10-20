@@ -1067,8 +1067,48 @@
             </div>
         </div>
         
+        <div class="section" id="projects">
+            <h2>我的项目</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">极域电子教室破解工具</h3>
+                        <p class="project-desc">功能强大的教学辅助工具，支持多种破解模式和自定义设置。</p>
+                        <a href="download.html" class="project-link">查看详情</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">数据备份助手</h3>
+                        <p class="project-desc">自动化数据保护解决方案，支持本地和云存储备份。</p>
+                        <a href="download.html" class="project-link">查看详情</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <div class="project-image">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">网络监测工具</h3>
+                        <p class="project-desc">实时网络状态分析工具，帮助用户监控网络健康状况。</p>
+                        <a href="download.html" class="project-link">查看详情</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="section" id="contact">
             <h2>联系我</h2>
+            <p>如果您对我的项目感兴趣或有任何合作意向，欢迎通过以下方式联系我：</p>
+            
             <div class="contact-methods">
                 <div class="contact-card">
                     <div class="contact-icon">
@@ -1143,12 +1183,279 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3emRuZWVhd3RnamxueXhqdGNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxOTc0MTcsImV4cCI6MjA3NTc3MzQxN30._yK9wpqT6Y8a_rzYeDloKvSbjaoIn_AFatgSlT-HqvI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        // 用户S币数据管理类
+        class UserScoinManager {
+            constructor(supabase) {
+                this.supabase = supabase;
+                this.currentUser = null;
+            }
+
+            // 初始化用户S币数据
+            async initUserScoin(user) {
+                try {
+                    this.currentUser = user;
+                    
+                    // 检查用户是否已有S币数据
+                    const { data: existingData, error: checkError } = await this.supabase
+                        .from('user_scoin')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .single();
+
+                    if (checkError && checkError.code !== 'PGRST116') {
+                        throw checkError;
+                    }
+
+                    if (!existingData) {
+                        // 创建新的用户S币记录
+                        return await this.createNewUserScoin(user);
+                    } else {
+                        // 更新现有用户数据
+                        return await this.updateUserScoin(existingData);
+                    }
+                } catch (error) {
+                    console.error('初始化用户S币数据失败:', error);
+                    throw error;
+                }
+            }
+
+            // 创建新用户S币记录
+            async createNewUserScoin(user) {
+                const initialBalance = user.email === '644043561@qq.com' ? 100 : 0;
+                
+                const { data, error } = await this.supabase
+                    .from('user_scoin')
+                    .insert([
+                        {
+                            user_id: user.id,
+                            username: user.email.split('@')[0],
+                            balance: initialBalance,
+                            total_earned: initialBalance,
+                            login_streak: 0,
+                            last_login_date: null,
+                            last_daily_claim: null
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // 如果是管理员，记录初始S币交易
+                if (initialBalance > 0) {
+                    await this.recordTransaction(
+                        'admin_bonus',
+                        initialBalance,
+                        '管理员初始奖励',
+                        initialBalance
+                    );
+                }
+
+                return data;
+            }
+
+            // 更新用户S币数据
+            async updateUserScoin(userData) {
+                const today = new Date().toISOString().split('T')[0];
+                
+                // 检查是否需要更新登录信息
+                if (userData.last_login_date !== today) {
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yesterdayStr = yesterday.toISOString().split('T')[0];
+                    
+                    let newLoginStreak = userData.login_streak;
+                    if (userData.last_login_date === yesterdayStr) {
+                        newLoginStreak += 1;
+                    } else if (userData.last_login_date !== today) {
+                        newLoginStreak = 1;
+                    }
+
+                    const { data, error } = await this.supabase
+                        .from('user_scoin')
+                        .update({
+                            login_streak: newLoginStreak,
+                            last_login_date: today,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', this.currentUser.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+                    return data;
+                }
+
+                return userData;
+            }
+
+            // 记录交易
+            async recordTransaction(type, amount, description, balanceAfter) {
+                try {
+                    const { error } = await this.supabase
+                        .from('scoin_transactions')
+                        .insert([
+                            {
+                                user_id: this.currentUser.id,
+                                username: this.currentUser.email.split('@')[0],
+                                type: type,
+                                amount: amount,
+                                description: description,
+                                balance_after: balanceAfter
+                            }
+                        ]);
+
+                    if (error) throw error;
+                    return true;
+                } catch (error) {
+                    console.error('记录交易失败:', error);
+                    return false;
+                }
+            }
+
+            // 获取用户S币数据
+            async getUserScoinData() {
+                try {
+                    const { data, error } = await this.supabase
+                        .from('user_scoin')
+                        .select('*')
+                        .eq('user_id', this.currentUser.id)
+                        .single();
+
+                    if (error) throw error;
+                    return data;
+                } catch (error) {
+                    console.error('获取用户S币数据失败:', error);
+                    return null;
+                }
+            }
+
+            // 领取每日S币
+            async claimDailyScoin() {
+                try {
+                    const userData = await this.getUserScoinData();
+                    if (!userData) throw new Error('用户数据不存在');
+
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    // 检查今天是否已经领取
+                    if (userData.last_daily_claim === today) {
+                        throw new Error('今天已经领取过每日S币了');
+                    }
+
+                    // 计算奖励
+                    const baseReward = 5;
+                    let streakBonus = 0;
+                    
+                    // 连续登录奖励
+                    if (userData.login_streak >= 7) {
+                        streakBonus = 10;
+                    }
+
+                    const totalReward = baseReward + streakBonus;
+                    const newBalance = userData.balance + totalReward;
+                    const newTotalEarned = userData.total_earned + totalReward;
+
+                    // 更新用户数据
+                    const { data, error } = await this.supabase
+                        .from('user_scoin')
+                        .update({
+                            balance: newBalance,
+                            total_earned: newTotalEarned,
+                            last_daily_claim: today,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', this.currentUser.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    // 记录交易
+                    const description = streakBonus > 0 
+                        ? `每日登录奖励 (连续${userData.login_streak}天)`
+                        : '每日登录奖励';
+                        
+                    await this.recordTransaction(
+                        'daily_reward',
+                        totalReward,
+                        description,
+                        newBalance
+                    );
+
+                    return {
+                        success: true,
+                        reward: totalReward,
+                        streakBonus: streakBonus,
+                        newBalance: newBalance,
+                        streak: userData.login_streak
+                    };
+
+                } catch (error) {
+                    console.error('领取每日S币失败:', error);
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            }
+
+            // 添加S币（用于捐献奖励等）
+            async addScoin(amount, description, type = 'manual') {
+                try {
+                    const userData = await this.getUserScoinData();
+                    if (!userData) throw new Error('用户数据不存在');
+
+                    const newBalance = userData.balance + amount;
+                    const newTotalEarned = userData.total_earned + amount;
+
+                    // 更新用户数据
+                    const { data, error } = await this.supabase
+                        .from('user_scoin')
+                        .update({
+                            balance: newBalance,
+                            total_earned: newTotalEarned,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', this.currentUser.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    // 记录交易
+                    await this.recordTransaction(
+                        type,
+                        amount,
+                        description,
+                        newBalance
+                    );
+
+                    return {
+                        success: true,
+                        newBalance: newBalance,
+                        amount: amount
+                    };
+
+                } catch (error) {
+                    console.error('添加S币失败:', error);
+                    return {
+                        success: false,
+                        error: error.message
+                    };
+                }
+            }
+        }
+
         // 用户状态管理
         const UserState = {
             currentUser: null,
             isLoggedIn: false,
+            scoinManager: null,
             
             async init() {
+                this.scoinManager = new UserScoinManager(supabase);
+                
                 // 从Supabase获取当前用户状态
                 try {
                     const { data: { user }, error } = await supabase.auth.getUser();
@@ -1163,14 +1470,14 @@
                         this.currentUser = {
                             id: user.id,
                             email: user.email,
-                            username: user.email.split('@')[0], // 使用邮箱前缀作为用户名
-                            isAdmin: user.email === '644043561@qq.com' // 站长邮箱判断
+                            username: user.email.split('@')[0],
+                            isAdmin: user.email === '644043561@qq.com'
                         };
                         this.isLoggedIn = true;
                         this.updateUI();
                         
                         // 初始化用户S币数据
-                        this.initUserScoin();
+                        await this.initUserScoin();
                     } else {
                         // 用户未登录
                         this.isLoggedIn = false;
@@ -1185,7 +1492,7 @@
                 }
                 
                 // 监听认证状态变化
-                supabase.auth.onAuthStateChange((event, session) => {
+                supabase.auth.onAuthStateChange(async (event, session) => {
                     if (event === 'SIGNED_IN' && session) {
                         // 用户登录
                         this.currentUser = {
@@ -1196,7 +1503,7 @@
                         };
                         this.isLoggedIn = true;
                         this.updateUI();
-                        this.initUserScoin();
+                        await this.initUserScoin();
                         showNotification('登录成功！');
                     } else if (event === 'SIGNED_OUT') {
                         // 用户退出
@@ -1206,6 +1513,19 @@
                         showNotification('已退出登录');
                     }
                 });
+            },
+            
+            async initUserScoin() {
+                if (!this.isLoggedIn) return;
+                
+                try {
+                    await this.scoinManager.initUserScoin(this.currentUser);
+                    const userData = await this.scoinManager.getUserScoinData();
+                    this.updateScoinDisplay(userData);
+                } catch (error) {
+                    console.error('初始化用户S币失败:', error);
+                    showNotification('S币系统初始化失败', true);
+                }
             },
             
             async logout() {
@@ -1266,35 +1586,15 @@
                 return colors[Math.abs(hash) % colors.length];
             },
             
-            initUserScoin() {
-                if (!this.isLoggedIn) return;
-                
-                const userKey = `scoin_${this.currentUser.email}`;
-                let scoinData = localStorage.getItem(userKey);
-                
-                if (!scoinData) {
-                    // 新用户初始化S币数据
-                    scoinData = {
-                        balance: this.currentUser.isAdmin ? 100 : 0,
-                        lastClaimDate: null,
-                        totalClaimed: 0
-                    };
-                    localStorage.setItem(userKey, JSON.stringify(scoinData));
-                } else {
-                    scoinData = JSON.parse(scoinData);
-                }
-                
-                // 更新显示
-                this.updateScoinDisplay(scoinData);
-            },
-            
             updateScoinDisplay(data) {
+                if (!data) return;
+                
                 document.getElementById('scoinBalance').textContent = data.balance;
                 document.getElementById('scoinCount').textContent = data.balance;
                 
                 // 检查今天是否已经领取
                 const today = new Date().toISOString().split('T')[0];
-                if (data.lastClaimDate === today) {
+                if (data.last_daily_claim === today) {
                     document.getElementById('claimScoinBtn').disabled = true;
                     document.getElementById('claimScoinBtn').innerHTML = '<i class="fas fa-check"></i> 今日已领取';
                     document.getElementById('scoinInfo').textContent = '您今天已经领取过S币了，明天再来吧！';
@@ -1305,29 +1605,23 @@
                 }
             },
             
-            claimScoin() {
+            async claimScoin() {
                 if (!this.isLoggedIn) {
                     showNotification('请先登录后领取S币');
                     return;
                 }
                 
-                const userKey = `scoin_${this.currentUser.email}`;
-                const scoinData = JSON.parse(localStorage.getItem(userKey));
-                const today = new Date().toISOString().split('T')[0];
+                const result = await this.scoinManager.claimDailyScoin();
                 
-                if (scoinData.lastClaimDate === today) {
-                    showNotification('今天已经领取过S币了！');
-                    return;
+                if (result.success) {
+                    this.updateScoinDisplay({
+                        balance: result.newBalance,
+                        last_daily_claim: new Date().toISOString().split('T')[0]
+                    });
+                    showNotification(`成功领取 ${result.reward} S币！连续登录 ${result.streak} 天`);
+                } else {
+                    showNotification(result.error, true);
                 }
-                
-                // 更新S币数据
-                scoinData.balance += 1;
-                scoinData.lastClaimDate = today;
-                scoinData.totalClaimed += 1;
-                
-                localStorage.setItem(userKey, JSON.stringify(scoinData));
-                this.updateScoinDisplay(scoinData);
-                showNotification('成功领取1个S币！');
             }
         };
 
