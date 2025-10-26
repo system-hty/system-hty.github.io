@@ -629,6 +629,12 @@
             transform: translateY(-2px);
         }
 
+        .btn-scoin:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            transform: none;
+        }
+
         footer {
             margin-top: 30px;
             padding-top: 20px;
@@ -694,6 +700,71 @@
             font-size: 1.2rem;
         }
 
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .top-nav {
@@ -755,6 +826,32 @@
     <div class="notification" id="notification">
         <i class="fas fa-check-circle notification-icon"></i>
         <span id="notificationText">操作成功！</span>
+    </div>
+
+    <!-- 头像上传模态框 -->
+    <div class="modal" id="avatarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">更换头像</h3>
+                <button class="close-btn" id="closeAvatarModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="avatar-container" style="width: 150px; height: 150px; margin: 0 auto 20px;">
+                        <img src="images/avatar.jpg" alt="头像预览" class="avatar" id="avatarPreview">
+                    </div>
+                    <p>选择一张图片作为您的头像</p>
+                </div>
+                <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
+                <button class="btn btn-primary" style="width: 100%;" onclick="document.getElementById('avatarFileInput').click()">
+                    <i class="fas fa-upload"></i> 选择图片
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAvatarBtn">取消</button>
+                <button class="btn btn-primary" id="saveAvatarBtn">保存头像</button>
+            </div>
+        </div>
     </div>
 
     <!-- 顶部导航 -->
@@ -985,11 +1082,6 @@
         </footer>
     </div>
 
-    <!-- 头像上传模态框 -->
-    <div style="display: none;" id="avatarUploadModal">
-        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
-    </div>
-
     <script>
         // 初始化Supabase客户端
         const supabaseUrl = 'https://uwzdneeawtgjlnyxjtcm.supabase.co';
@@ -1001,6 +1093,7 @@
             currentUser: null,
             userProfile: null,
             isEditing: false,
+            avatarFile: null,
 
             async init() {
                 await this.loadCurrentUser();
@@ -1032,7 +1125,7 @@
 
             async loadUserProfile() {
                 try {
-                    // 先从user_scoin表获取基础信息
+                    // 从user_scoin表获取基础信息
                     const { data: scoinData, error: scoinError } = await supabase
                         .from('user_scoin')
                         .select('*')
@@ -1040,10 +1133,10 @@
                         .single();
 
                     if (scoinError && scoinError.code !== 'PGRST116') {
-                        throw scoinError;
+                        console.error('获取S币数据失败:', scoinError);
                     }
 
-                    // 尝试从user_profiles表获取扩展信息
+                    // 从user_profiles表获取扩展信息
                     let { data: profileData, error: profileError } = await supabase
                         .from('user_profiles')
                         .select('*')
@@ -1054,19 +1147,21 @@
                     if (profileError && profileError.code === 'PGRST116') {
                         profileData = await this.createDefaultProfile();
                     } else if (profileError) {
-                        throw profileError;
+                        console.error('获取用户资料失败:', profileError);
                     }
 
                     this.userProfile = {
-                        ...scoinData,
-                        ...profileData,
+                        username: this.currentUser.username,
                         display_name: profileData?.display_name || this.currentUser.username,
                         title: profileData?.title || 'SYSTEM-HTY 社区成员',
                         bio: profileData?.bio || '这个人很懒，什么都没有写...',
                         location: profileData?.location || '未设置',
                         website: profileData?.website || '未设置',
                         avatar_url: profileData?.avatar_url || 'images/avatar.jpg',
-                        join_date: profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString() : new Date().toLocaleDateString()
+                        join_date: profileData?.created_at ? new Date(profileData.created_at).toLocaleDateString() : new Date().toLocaleDateString(),
+                        balance: scoinData?.balance || 0,
+                        login_streak: scoinData?.login_streak || 0,
+                        last_daily_claim: scoinData?.last_daily_claim
                     };
 
                 } catch (error) {
@@ -1093,13 +1188,15 @@
                     .select()
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('创建默认资料失败:', error);
+                    return defaultProfile;
+                }
                 return data;
             },
 
             getDefaultProfile() {
                 return {
-                    user_id: this.currentUser.id,
                     username: this.currentUser.username,
                     display_name: this.currentUser.username,
                     title: 'SYSTEM-HTY 社区成员',
@@ -1117,7 +1214,10 @@
                 try {
                     const { data, error } = await supabase
                         .from('user_profiles')
-                        .update(updates)
+                        .update({
+                            ...updates,
+                            updated_at: new Date().toISOString()
+                        })
                         .eq('user_id', this.currentUser.id)
                         .select()
                         .single();
@@ -1132,8 +1232,94 @@
 
                 } catch (error) {
                     console.error('更新资料失败:', error);
-                    this.showNotification('更新资料失败', 'error');
+                    this.showNotification('更新资料失败: ' + error.message, 'error');
                     throw error;
+                }
+            },
+
+            async updateAvatar(avatarUrl) {
+                try {
+                    const { data, error } = await supabase
+                        .from('user_profiles')
+                        .update({
+                            avatar_url: avatarUrl,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', this.currentUser.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    this.userProfile.avatar_url = avatarUrl;
+                    this.updateAvatarDisplay();
+                    this.showNotification('头像更新成功！', 'success');
+                    return data;
+
+                } catch (error) {
+                    console.error('更新头像失败:', error);
+                    this.showNotification('更新头像失败: ' + error.message, 'error');
+                    throw error;
+                }
+            },
+
+            async claimDailyScoin() {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    
+                    // 检查今天是否已经领取
+                    if (this.userProfile.last_daily_claim === today) {
+                        this.showNotification('今天已经领取过S币了！', 'error');
+                        return;
+                    }
+
+                    // 计算奖励
+                    const baseReward = 5;
+                    const streakBonus = this.userProfile.login_streak >= 7 ? 10 : 0;
+                    const totalReward = baseReward + streakBonus;
+
+                    // 更新S币数据
+                    const { data, error } = await supabase
+                        .from('user_scoin')
+                        .update({
+                            balance: this.userProfile.balance + totalReward,
+                            total_earned: (this.userProfile.total_earned || 0) + totalReward,
+                            last_daily_claim: today,
+                            login_streak: this.userProfile.last_daily_claim ? 
+                                (new Date(this.userProfile.last_daily_claim).toISOString().split('T')[0] === 
+                                 new Date(Date.now() - 86400000).toISOString().split('T')[0] ? 
+                                 this.userProfile.login_streak + 1 : 1) : 1,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', this.currentUser.id)
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    // 记录交易
+                    await supabase
+                        .from('scoin_transactions')
+                        .insert([{
+                            user_id: this.currentUser.id,
+                            username: this.currentUser.username,
+                            type: 'daily_reward',
+                            amount: totalReward,
+                            description: `每日登录奖励 (连续${data.login_streak}天)`,
+                            balance_after: data.balance
+                        }]);
+
+                    // 更新本地数据
+                    this.userProfile.balance = data.balance;
+                    this.userProfile.last_daily_claim = today;
+                    this.userProfile.login_streak = data.login_streak;
+
+                    this.showNotification(`成功领取 ${totalReward} S币！连续登录 ${data.login_streak} 天`, 'success');
+                    this.updateUI();
+
+                } catch (error) {
+                    console.error('领取S币失败:', error);
+                    this.showNotification('领取S币失败: ' + error.message, 'error');
                 }
             },
 
@@ -1155,23 +1341,40 @@
 
                 // 更换头像按钮
                 document.getElementById('changeAvatarBtn').addEventListener('click', () => {
-                    this.triggerAvatarUpload();
+                    this.openAvatarModal();
                 });
 
                 // 头像容器点击
                 document.getElementById('avatarContainer').addEventListener('click', () => {
-                    this.triggerAvatarUpload();
+                    this.openAvatarModal();
+                });
+
+                // 头像模态框关闭
+                document.getElementById('closeAvatarModal').addEventListener('click', () => {
+                    this.closeAvatarModal();
+                });
+
+                document.getElementById('cancelAvatarBtn').addEventListener('click', () => {
+                    this.closeAvatarModal();
+                });
+
+                // 保存头像按钮
+                document.getElementById('saveAvatarBtn').addEventListener('click', () => {
+                    this.saveAvatar();
                 });
 
                 // 头像文件选择
                 document.getElementById('avatarFileInput').addEventListener('change', (e) => {
-                    this.handleAvatarUpload(e.target.files[0]);
+                    this.handleAvatarSelect(e.target.files[0]);
                 });
 
                 // 领取S币按钮
                 document.getElementById('claimScoinBtn').addEventListener('click', () => {
                     this.claimDailyScoin();
                 });
+
+                // 检查今天是否可以领取S币
+                this.updateScoinButtonState();
             },
 
             toggleEditMode(enable) {
@@ -1203,8 +1406,7 @@
                     title: document.getElementById('editTitle').value,
                     bio: document.getElementById('editBio').value,
                     location: document.getElementById('editLocation').value,
-                    website: document.getElementById('editWebsite').value,
-                    updated_at: new Date().toISOString()
+                    website: document.getElementById('editWebsite').value
                 };
 
                 try {
@@ -1215,21 +1417,45 @@
                 }
             },
 
-            triggerAvatarUpload() {
-                document.getElementById('avatarFileInput').click();
+            openAvatarModal() {
+                document.getElementById('avatarModal').classList.add('show');
+                // 重置预览
+                document.getElementById('avatarPreview').src = this.userProfile.avatar_url;
+                this.avatarFile = null;
             },
 
-            async handleAvatarUpload(file) {
+            closeAvatarModal() {
+                document.getElementById('avatarModal').classList.remove('show');
+                this.avatarFile = null;
+            },
+
+            handleAvatarSelect(file) {
                 if (!file) return;
 
-                // 简单的文件验证
+                // 文件验证
                 if (!file.type.startsWith('image/')) {
                     this.showNotification('请选择图片文件', 'error');
                     return;
                 }
 
-                if (file.size > 5 * 1024 * 1024) { // 5MB
+                if (file.size > 5 * 1024 * 1024) {
                     this.showNotification('图片大小不能超过5MB', 'error');
+                    return;
+                }
+
+                this.avatarFile = file;
+                
+                // 显示预览
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            },
+
+            async saveAvatar() {
+                if (!this.avatarFile) {
+                    this.showNotification('请先选择头像图片', 'error');
                     return;
                 }
 
@@ -1237,15 +1463,14 @@
                     this.showNotification('正在上传头像...', 'info');
                     
                     // 在实际项目中，这里应该上传到Supabase Storage
-                    // 这里我们模拟上传过程
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    // 生成预览URL
-                    const avatarUrl = URL.createObjectURL(file);
-                    
-                    // 更新头像显示
-                    this.updateAvatar(avatarUrl);
-                    this.showNotification('头像更新成功！', 'success');
+                    // 这里我们使用Data URL模拟上传
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const avatarUrl = e.target.result;
+                        await this.updateAvatar(avatarUrl);
+                        this.closeAvatarModal();
+                    };
+                    reader.readAsDataURL(this.avatarFile);
 
                 } catch (error) {
                     console.error('头像上传失败:', error);
@@ -1253,38 +1478,51 @@
                 }
             },
 
-            updateAvatar(avatarUrl) {
+            updateAvatarDisplay() {
                 const avatarElements = [
                     document.getElementById('profileAvatar'),
-                    document.getElementById('navAvatar').querySelector('img')
+                    document.getElementById('navAvatar').querySelector('img'),
+                    document.getElementById('avatarPreview')
                 ];
 
                 avatarElements.forEach(avatar => {
                     if (avatar) {
-                        avatar.src = avatarUrl;
+                        avatar.src = this.userProfile.avatar_url;
                     }
                 });
+
+                // 同时更新首页的头像（如果存在）
+                const indexAvatar = document.querySelector('index.html .user-avatar img');
+                if (indexAvatar) {
+                    indexAvatar.src = this.userProfile.avatar_url;
+                }
             },
 
-            async claimDailyScoin() {
-                try {
-                    // 这里应该调用S币系统的领取接口
-                    this.showNotification('S币领取功能开发中...', 'info');
-                } catch (error) {
-                    console.error('领取S币失败:', error);
-                    this.showNotification('领取S币失败', 'error');
+            updateScoinButtonState() {
+                const claimBtn = document.getElementById('claimScoinBtn');
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (this.userProfile.last_daily_claim === today) {
+                    claimBtn.disabled = true;
+                    claimBtn.innerHTML = '<i class="fas fa-check"></i> 今日已领取';
+                } else {
+                    claimBtn.disabled = false;
+                    claimBtn.innerHTML = '<i class="fas fa-gift"></i> 每日领取';
                 }
             },
 
             updateUI() {
                 // 更新导航栏
                 document.getElementById('navUserName').textContent = this.userProfile.display_name;
-                document.getElementById('navScoinCount').textContent = this.userProfile.balance || 0;
+                document.getElementById('navScoinCount').textContent = this.userProfile.balance;
 
                 // 更新个人资料头部
                 document.getElementById('profileName').textContent = this.userProfile.display_name;
                 document.getElementById('profileTitle').textContent = this.userProfile.title;
                 document.getElementById('profileBio').textContent = this.userProfile.bio;
+
+                // 更新头像
+                this.updateAvatarDisplay();
 
                 // 更新用户徽章
                 const badge = document.getElementById('userBadge');
@@ -1307,7 +1545,11 @@
                 document.getElementById('infoWebsite').textContent = this.userProfile.website;
 
                 // 更新S币信息
-                document.getElementById('scoinBalance').textContent = this.userProfile.balance || 0;
+                document.getElementById('scoinBalance').textContent = this.userProfile.balance;
+                document.getElementById('navScoinCount').textContent = this.userProfile.balance;
+
+                // 更新S币按钮状态
+                this.updateScoinButtonState();
 
                 // 更新关于我内容
                 this.updateAboutContent();
