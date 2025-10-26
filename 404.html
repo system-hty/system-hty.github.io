@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>页面未找到 - 404错误</title>
+    <title>页面未找到 - 404错误 | SYSTEM-HTY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -19,6 +19,7 @@
             --transition: all 0.3s ease;
             --nav-bg: rgba(255, 255, 255, 0.95);
             --border-color: #ddd;
+            --scoin-color: #9c27b0;
         }
 
         [data-theme="dark"] {
@@ -33,6 +34,7 @@
             --dark-color: #f5f5f5;
             --nav-bg: rgba(30, 30, 30, 0.95);
             --border-color: #444;
+            --scoin-color: #ba68c8;
         }
 
         * {
@@ -50,6 +52,73 @@
             scroll-behavior: smooth;
             background-color: var(--light-color);
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            left: 70%;
+            animation-delay: -10s;
+        }
+
+        .shape-4 {
+            width: 250px;
+            height: 250px;
+            top: 70%;
+            left: 10%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(20px, 20px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 40px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-20px, 20px) rotate(270deg);
+            }
         }
         
         .top-nav {
@@ -65,6 +134,7 @@
             z-index: 100;
             box-shadow: var(--shadow);
             border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
         }
 
         .brand {
@@ -152,6 +222,16 @@
             overflow: hidden;
         }
 
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ffd700, #c0c0c0, #ffd700);
+        }
+
         .hero-title {
             font-size: 6rem;
             margin-bottom: 20px;
@@ -205,6 +285,10 @@
             margin: 35px 0;
             text-align: center;
             border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .contact-info {
+            background: rgba(30, 30, 30, 0.5);
         }
         
         .contact-info h3 {
@@ -263,14 +347,14 @@
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: transparent;
             backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            color: var(--dark-color);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(52, 152, 219, 0.1);
         }
         
         footer {
@@ -283,7 +367,7 @@
         
         .theme-toggle {
             position: fixed;
-            top: 80px;
+            top: 20px;
             right: 20px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -301,6 +385,42 @@
         
         .theme-toggle:hover {
             transform: rotate(45deg);
+        }
+
+        /* 搜索建议 */
+        .search-suggestions {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-suggestions h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .suggestion-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .suggestion-link {
+            padding: 8px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 20px;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .suggestion-link:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
         }
         
         /* 响应式设计 */
@@ -353,14 +473,34 @@
             .error-icon {
                 font-size: 5rem;
             }
+
+            .theme-toggle {
+                top: 80px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .suggestion-links {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 背景动画 -->
+    <div class="bg-animation">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+        <div class="bg-shape shape-4"></div>
+    </div>
+
     <div class="top-nav">
         <div class="brand">
             <div class="brand-logo">
-                <img src="images/2.webp" alt="SYSTEM-HTY标志" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=SYSTEM-HTY'">
+                <img src="images/2.webp" alt="SYSTEM-HTY标志" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzQ5OGRiIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+U1lTVEVNLUhUWTwvdGV4dD48L3N2Zz4='">
             </div>
             <div class="brand-name">SYSTEM-HTY</div>
         </div>
@@ -371,6 +511,9 @@
             </a>
             <a href="download.html" class="nav-link">
                 <i class="fas fa-download"></i> 下载
+            </a>
+            <a href="bbs.html" class="nav-link">
+                <i class="fas fa-comments"></i> 论坛
             </a>
             <a href="about.html" class="nav-link">
                 <i class="fas fa-info-circle"></i> 关于
@@ -400,6 +543,19 @@
                 <p>您正在尝试访问的页面不存在或已被移除。</p>
                 <p>这可能是因为链接已过期，或者您输入了错误的URL地址。</p>
             </div>
+
+            <!-- 搜索建议 -->
+            <div class="search-suggestions">
+                <h3>您可能在寻找：</h3>
+                <div class="suggestion-links">
+                    <a href="download.html" class="suggestion-link">工具下载</a>
+                    <a href="bbs.html" class="suggestion-link">社区论坛</a>
+                    <a href="about.html" class="suggestion-link">关于我们</a>
+                    <a href="scoin-system.html" class="suggestion-link">S币系统</a>
+                    <a href="login.html" class="suggestion-link">用户登录</a>
+                    <a href="PersonalHomepage.html" class="suggestion-link">个人主页</a>
+                </div>
+            </div>
             
             <div class="contact-info">
                 <h3>需要帮助？</h3>
@@ -416,53 +572,75 @@
                 <a href="download.html" class="btn btn-secondary">
                     <i class="fas fa-download"></i> 下载页面
                 </a>
-                <a href="about.html" class="btn btn-secondary">
-                    <i class="fas fa-info-circle"></i> 关于我们
+                <a href="bbs.html" class="btn btn-secondary">
+                    <i class="fas fa-comments"></i> 社区论坛
                 </a>
             </div>
         </div>
         
         <footer>
             <p>© 2023-2025 SYSTEM-HTY. 保留所有权利。</p>
-            <p>页面未找到 - 404错误页面</p>
+            <p>页面未找到 - 404错误页面 | 最后更新: 2023-10-15</p>
         </footer>
     </div>
 
     <script>
         // 初始化主题切换
         function initThemeToggle() {
-            var themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                // 检查本地存储的主题设置
-                if (localStorage.getItem('theme') === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                } else {
+            const themeToggle = document.getElementById('themeToggle');
+            
+            // 检查本地存储的主题设置
+            if (localStorage.getItem('theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                if (currentTheme === 'dark') {
                     document.documentElement.removeAttribute('data-theme');
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    localStorage.setItem('theme', 'light');
+                    this.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    this.innerHTML = '<i class="fas fa-sun"></i>';
                 }
-                
-                themeToggle.addEventListener('click', function() {
-                    var currentTheme = document.documentElement.getAttribute('data-theme');
-                    if (currentTheme === 'dark') {
-                        document.documentElement.removeAttribute('data-theme');
-                        localStorage.setItem('theme', 'light');
-                        this.innerHTML = '<i class="fas fa-moon"></i>';
-                    } else {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                        localStorage.setItem('theme', 'dark');
-                        this.innerHTML = '<i class="fas fa-sun"></i>';
-                    }
-                });
+            });
+        }
+
+        // 添加随机幽默提示
+        const errorMessages = [
+            "别担心，即使是最好的程序员也会写出bug！",
+            "这个页面可能去度假了，暂时找不到。",
+            "404：页面未找到，但希望您找到了好心情！",
+            "看起来这个页面比我的代码还神秘...",
+            "页面走丢了，就像我有时候忘记保存代码一样。"
+        ];
+
+        function showRandomMessage() {
+            const messages = document.querySelectorAll('.error-message p');
+            if (messages.length > 1) {
+                const randomMessage = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+                const newP = document.createElement('p');
+                newP.textContent = randomMessage;
+                newP.style.fontStyle = 'italic';
+                newP.style.color = 'var(--text-light)';
+                newP.style.marginTop = '15px';
+                messages[1].parentNode.insertBefore(newP, messages[1].nextSibling);
             }
         }
         
         // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             initThemeToggle();
+            showRandomMessage();
             
             // 添加页面加载动画效果
-            const elements = document.querySelectorAll('.hero-title, .hero-subtitle, .error-icon, .error-message, .contact-info, .btn-container');
+            const elements = document.querySelectorAll('.hero-title, .hero-subtitle, .error-icon, .error-message, .search-suggestions, .contact-info, .btn-container');
             elements.forEach((el, index) => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(20px)';
@@ -472,6 +650,28 @@
                     el.style.transform = 'translateY(0)';
                 }, 100 + (index * 150));
             });
+
+            // 添加快捷键支持
+            document.addEventListener('keydown', function(e) {
+                // Alt + H 返回首页
+                if (e.altKey && e.key === 'h') {
+                    e.preventDefault();
+                    window.location.href = 'index.html';
+                }
+                // Alt + D 前往下载页面
+                if (e.altKey && e.key === 'd') {
+                    e.preventDefault();
+                    window.location.href = 'download.html';
+                }
+            });
+
+            // 显示快捷键提示（仅首次访问）
+            if (!sessionStorage.getItem('404-visited')) {
+                setTimeout(() => {
+                    console.log('💡 提示：使用 Alt+H 快速返回首页，Alt+D 前往下载页面');
+                }, 2000);
+                sessionStorage.setItem('404-visited', 'true');
+            }
         });
     </script>
 </body>
